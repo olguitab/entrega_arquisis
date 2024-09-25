@@ -12,18 +12,18 @@ const mongoose_1 = require("@nestjs/mongoose");
 const fixtures_schema_1 = require("./fixtures/fixtures.schema");
 const fixtures_controller_1 = require("./fixtures/fixtures.controller");
 const fixtures_service_1 = require("./fixtures/fixtures.service");
-const mqtt_service_1 = require("./mqtt/mqtt.service");
+const initialization_service_1 = require("./initialization/initialization.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot('mongodb://localhost:27017/e0bd'),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGO_URI),
             mongoose_1.MongooseModule.forFeature([{ name: 'Fixture', schema: fixtures_schema_1.FixtureSchema }]),
         ],
         controllers: [fixtures_controller_1.FixturesController],
-        providers: [fixtures_service_1.FixtureService, mqtt_service_1.MqttService],
+        providers: [fixtures_service_1.FixtureService, initialization_service_1.InitializationService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
