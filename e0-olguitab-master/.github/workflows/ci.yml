@@ -1,0 +1,51 @@
+name: Run Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Checkout del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Paso 3: Instalar dependencias
+      - name: Install dependencies
+        run: npm install
+
+      # Paso 4: Linting
+      - name: Lint code
+        run: npm run lint
+
+      """
+      # Paso 5: Compilar la aplicación
+      - name: Build the application
+        run: npm run build
+
+      # Paso 6: Ejecutar pruebas unitarias
+      - name: Run unit tests
+        run: npm run test
+
+      # Paso 7: Analizar cobertura de pruebas
+      - name: Test coverage
+        run: npm run test:cov
+
+      # Paso 8: Ejecutar pruebas End-to-End
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+      """
+
