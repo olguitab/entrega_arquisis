@@ -22,7 +22,8 @@ export class FixturesController {
       const fixtures = message.fixtures;
       console.log('Processing fixtures:', fixtures);
 
-      const savedFixtures = await this.fixtureService.createFixtures(fixtures);
+      //const savedFixtures = await this.fixtureService.createFixtures(fixtures);
+      const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
       console.log('Saved fixtures:', savedFixtures);
 
       return {

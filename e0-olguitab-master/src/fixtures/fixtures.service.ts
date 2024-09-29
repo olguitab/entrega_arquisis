@@ -7,6 +7,7 @@ import { Fixture } from './fixtures.schema';
 export class FixtureService {
   constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>) {}
 
+    /*
   async createFixtures(fixturesData: any[]): Promise<any[]> {
     const savedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
@@ -15,6 +16,20 @@ export class FixtureService {
       }),
     );
     return savedFixtures;
+  }
+    */
+
+  async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
+    const updatedFixtures = await Promise.all(
+      fixturesData.map(async (fixtureData) => {
+        return await this.fixtureModel.findOneAndUpdate(
+          { id: fixtureData.id },  // busca id
+          fixtureData,  // si lo encuentra actualiza
+          { upsert: true, new: true }  // si no lo encuentra, inserta (eso hace el upsert)
+        );
+      })
+    );
+    return updatedFixtures;
   }
 
   async getAllFixtures(page: number, count: number, filters: any): Promise<Fixture[]> {
