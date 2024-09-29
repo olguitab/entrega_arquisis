@@ -23,7 +23,7 @@ export class FixtureService {
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
         return await this.fixtureModel.findOneAndUpdate(
-          { id: fixtureData.id },  // busca id
+          { 'fixture.id': fixtureData.fixture.id },  // busca id
           fixtureData,  // si lo encuentra actualiza
           { upsert: true, new: true }  // si no lo encuentra, inserta (eso hace el upsert)
         );
