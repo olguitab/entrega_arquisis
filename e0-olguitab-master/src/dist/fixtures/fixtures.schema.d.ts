@@ -9,7 +9,7 @@ export declare const FixtureSchema: Schema<any, import("mongoose").Model<any, an
         name?: string;
     }>;
     fixture?: {
-        date: Date;
+        date: NativeDate;
         id?: number;
         referee?: string;
         timezone?: string;
@@ -57,7 +57,7 @@ export declare const FixtureSchema: Schema<any, import("mongoose").Model<any, an
         name?: string;
     }>;
     fixture?: {
-        date: Date;
+        date: NativeDate;
         id?: number;
         referee?: string;
         timezone?: string;
@@ -105,7 +105,7 @@ export declare const FixtureSchema: Schema<any, import("mongoose").Model<any, an
         name?: string;
     }>;
     fixture?: {
-        date: Date;
+        date: NativeDate;
         id?: number;
         referee?: string;
         timezone?: string;

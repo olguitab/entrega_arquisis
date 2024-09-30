@@ -20,12 +20,11 @@ let FixtureService = class FixtureService {
     constructor(fixtureModel) {
         this.fixtureModel = fixtureModel;
     }
-    async createFixtures(fixturesData) {
-        const savedFixtures = await Promise.all(fixturesData.map(async (fixtureData) => {
-            const fixture = new this.fixtureModel(fixtureData);
-            return await fixture.save();
+    async createOrUpdateFixtures(fixturesData) {
+        const updatedFixtures = await Promise.all(fixturesData.map(async (fixtureData) => {
+            return await this.fixtureModel.findOneAndUpdate({ 'fixture.id': fixtureData.fixture.id }, fixtureData, { upsert: true, new: true });
         }));
-        return savedFixtures;
+        return updatedFixtures;
     }
     async getAllFixtures(page, count, filters) {
         const query = this.fixtureModel.find(filters);

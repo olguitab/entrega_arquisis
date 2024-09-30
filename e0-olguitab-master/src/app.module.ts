@@ -10,6 +10,7 @@ import { FixturesModule } from 'fixtures/fixtures.module';
 import { BetSchema } from 'bets/bet.schema';
 import { PreValidateBetModule } from 'bets/pre-validate-bet/pre-validate-bet.module';
 import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
+import { WalletModule } from 'wallet/wallet.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
     FixturesModule,
     PreValidateBetModule,
     ValidateBetModule,
+    WalletModule,
   ],
   controllers: [FixturesController],
   providers: [FixtureService, InitializationService],
