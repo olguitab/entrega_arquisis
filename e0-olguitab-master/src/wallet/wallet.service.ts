@@ -26,23 +26,54 @@ export class WalletService {
       }
     }
   }
-
+  
   async createWallet(user_id: Types.ObjectId): Promise<void> {
     await this.walletModel.create({
       user_id,
       money: 0,
     });
+    console.log(`Wallet creada para el usuario: ${user_id}`);
   }
+
+  /*
+
 
   async addMoneyToWallet(user_id: Types.ObjectId, amount: number): Promise<void> {
     await this.walletModel.updateOne({ user_id }, { $inc: { money: amount } });
   }
+  */
+
+
+  async addMoneyToWallet(user_id: string, amount: number): Promise<void> {
+    console.log(`entra a add ${amount} money to wallet id: ${user_id}`);
+  
+    // Convierte el user_id de string a ObjectId
+    const userObjectId = new Types.ObjectId(user_id);
+  
+    const wallet = await this.walletModel.findOneAndUpdate(
+      { user_id: userObjectId }, // Usar el ObjectId aquí
+      { $inc: { money: amount } }, // Asegúrate de usar 'money' en lugar de 'balance'
+      { new: true, upsert: true } // 'new' devuelve el documento actualizado
+    );
+  
+    if (!wallet) {
+      throw new Error('Wallet not found');
+    }
+  
+    console.log(`Money added to wallet: ${wallet}`);
+  }
 
   async getWalletBalance(user_id: string): Promise<number> {
+    console.log('entra a get wallet balance id:', user_id);
     const wallet = await this.walletModel.findOne({ user_id });
     if (!wallet) {
       throw new Error('Wallet not found');
     }
     return wallet.money;
+  }
+
+  async findAll(): Promise<Wallet[]> {
+    console.log('entra al get findAll wallets');
+    return await this.walletModel.find().exec();
   }
 }

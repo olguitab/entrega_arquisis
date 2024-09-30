@@ -56,8 +56,8 @@ client.on('message', async (topic, message) => {
           message: parsedMessage,
         });
         
-       // imprimir json parseado pero de vuelta a string con 2 parseos
-       //console.log('History fixtures:',message.toString());
+       
+        console.log('History fixtures:',message.toString());
         break;
 
       default:

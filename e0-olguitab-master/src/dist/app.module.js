@@ -13,6 +13,8 @@ const fixtures_schema_1 = require("./fixtures/fixtures.schema");
 const fixtures_controller_1 = require("./fixtures/fixtures.controller");
 const fixtures_service_1 = require("./fixtures/fixtures.service");
 const initialization_service_1 = require("./initialization/initialization.service");
+const user_module_1 = require("./user/user.module");
+const wallet_module_1 = require("./wallet/wallet.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -21,6 +23,8 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forRoot(process.env.MONGO_URI),
             mongoose_1.MongooseModule.forFeature([{ name: 'Fixture', schema: fixtures_schema_1.FixtureSchema }]),
+            user_module_1.UsersModule,
+            wallet_module_1.WalletModule,
         ],
         controllers: [fixtures_controller_1.FixturesController],
         providers: [fixtures_service_1.FixtureService, initialization_service_1.InitializationService],

@@ -15,5 +15,6 @@ import { User, UserSchema } from 'user/user.schema';
   ],
   controllers: [WalletController],
   providers: [WalletService],
+  exports: [WalletService], 
 })
 export class WalletModule {}
