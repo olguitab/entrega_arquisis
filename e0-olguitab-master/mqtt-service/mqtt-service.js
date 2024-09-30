@@ -50,14 +50,14 @@ client.on('message', async (topic, message) => {
 
         // es decir, buscar en bonos comprados todos los ids de los matches y actualizar y entregar dinero
       case 'fixtures/history':
-        /*
+        
         await axios.post(`${process.env.APP_URL}/fixtures/history`, {
           topic,
           message: parsedMessage,
         });
-        */
+        
        // imprimir json parseado pero de vuelta a string con 2 parseos
-       console.log('History fixtures:',message.toString());
+       //console.log('History fixtures:',message.toString());
         break;
 
       default:

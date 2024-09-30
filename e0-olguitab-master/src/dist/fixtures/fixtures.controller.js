@@ -31,7 +31,7 @@ let FixturesController = class FixturesController {
                 };
             }
             const fixtures = message.fixtures;
-            console.log('Processing fixtures:', fixtures);
+            //console.log('Processing fixtures:', fixtures);
             const savedFixtures = await this.fixtureService.createFixtures(fixtures);
             console.log('Saved fixtures:', savedFixtures);
             return {
