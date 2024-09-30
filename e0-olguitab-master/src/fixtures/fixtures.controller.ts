@@ -3,7 +3,8 @@ import { FixtureService } from './fixtures.service';
 
 @Controller('fixtures')
 export class FixturesController {
-  constructor(private readonly fixtureService: FixtureService) {}
+  constructor(private readonly fixtureService: FixtureService,) {};
+
 
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
@@ -38,6 +39,7 @@ export class FixturesController {
       };
     }
   }
+
 
   @Get(':id')
   async getFixtureById(@Param('id') id: string): Promise<any> {
