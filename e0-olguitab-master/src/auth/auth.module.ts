@@ -11,8 +11,8 @@ import { AuthService } from './auth.service';
         forwardRef(() => UsersModule),
       PassportModule,
       JwtModule.register({
-        secret: 'secretKey', // Asegúrate de usar una clave segura y almacenarla en un lugar seguro
-        signOptions: { expiresIn: '60s' }, // Configura según tus necesidades
+        secret: 'secretKey', // cambiar por JWT_SECRET del .env
+        signOptions: { expiresIn: '24h' }, 
       }),
     ],
     providers: [AuthService, JwtStrategy],

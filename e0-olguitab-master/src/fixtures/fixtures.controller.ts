@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException, Patch } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 
 @Controller('fixtures')
@@ -9,26 +9,16 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      //console.log('Received request body process:', requestBody);
       const { message } = requestBody;
-
+      //('Received request body process fixtures:', message.fixtures);
+      
       if (!message || !Array.isArray(message.fixtures)) {
-        console.log('Invalid data format:', requestBody);
+        console.log('Invalid data format in processFixtures:', requestBody);
         return {
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Invalid data format',
         };
       }
-
-      /*
-      const fixtures = message.fixtures;
-      console.log('Processing fixtures:', fixtures);
-
-      //const savedFixtures = await this.fixtureService.createFixtures(fixtures);
-      const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-      console.log('Saved fixtures:', savedFixtures);
-      */
-
       const savedFixtures = await this.processFixturesData(message.fixtures);
       
 
@@ -66,15 +56,15 @@ export class FixturesController {
     //console.log('Processing fixtures:', fixtures);
 
     const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-    console.log('Saved fixtures:', savedFixtures);
+    //console.log('Saved fixtures:', savedFixtures);
 
     return savedFixtures;
   }
 
-  @Post('history')
+  @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      //console.log('Received request body for history:', requestBody);
+      //console.log('Enter patch for history');
       const { message } = requestBody;
   
       // Usar la función de validación
@@ -83,10 +73,9 @@ export class FixturesController {
         return validation.error;
       }
 
-      const savedFixtures = await this.processFixturesData(message);
+      const updatedFixtures = await this.fixtureService.processHistoryFixtures(message.fixtures);
   
-      // Lógica adicional específica para 'history'
-      console.log('Additional processing for history...');
+      //console.log('Additional processing for history...');
       // acá filtrar los ids y buscar bonos comprados de esos partidos, mandar los savedFixtures
       // allá procesar según ids de partidos y actualizar bonos que estén con estado pendiente
   

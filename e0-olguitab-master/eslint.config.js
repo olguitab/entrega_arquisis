@@ -49,6 +49,7 @@ module.exports = [
 
       // Prettier
       //'prettier/prettier': ['error'], // Integra Prettier como regla de ESLint
+
     },
   },
 ];

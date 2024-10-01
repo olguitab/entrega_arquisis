@@ -38,7 +38,7 @@ client.on('message', async (topic, message) => {
   if (topic === 'fixtures/validation') {
     try {
       const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message, sending to app...');
+      console.log('Received message on fixtures/validation, sending to app...');
 
       await axios.post(`${process.env.APP_URL}/validate-bet`, {
         topic,
@@ -50,8 +50,9 @@ client.on('message', async (topic, message) => {
   } else if (topic === 'fixtures/info') {
     // Procesar mensajes de fixtures/info como antes
     try {
-      const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message, sending to app...');
+      const parsedMessage = JSON.parse(JSON.parse(message.toString()));
+      console.log('Received message on fixtures/info, sending to app...');
+      //console.log('string json:', message.toString());
 
       await axios.post(`${process.env.APP_URL}/fixtures/process`, {
         topic,
@@ -71,10 +72,10 @@ client.on('message', async (topic, message) => {
 
         // es decir, buscar en bonos comprados todos los ids de los matches y actualizar y entregar dinero
     try {
-      const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message, sending to app...');
+      const parsedMessage = JSON.parse(JSON.parse(message.toString()));
+      console.log('Received message on fixtures/history, sending to app...');
 
-      await axios.post(`${process.env.APP_URL}/fixtures/history`, {
+      await axios.patch(`${process.env.APP_URL}/fixtures/history`, {
         topic,
         message: parsedMessage,
       });

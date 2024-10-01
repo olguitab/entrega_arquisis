@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from 'user/user.schema';
 import { Wallet } from './wallet.schema';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WalletService {
@@ -32,20 +33,12 @@ export class WalletService {
       user_id,
       money: 0,
     });
-    console.log(`Wallet creada para el usuario: ${user_id}`);
+    //console.log(`Wallet creada para el usuario: ${user_id}`);
   }
-
-  /*
-
-
-  async addMoneyToWallet(user_id: Types.ObjectId, amount: number): Promise<void> {
-    await this.walletModel.updateOne({ user_id }, { $inc: { money: amount } });
-  }
-  */
 
 
   async addMoneyToWallet(user_id: string, amount: number): Promise<void> {
-    console.log(`entra a add ${amount} money to wallet id: ${user_id}`);
+    //console.log(`entra a add ${amount} money to wallet id: ${user_id}`);
   
     // Convierte el user_id de string a ObjectId
     const userObjectId = new Types.ObjectId(user_id);
@@ -60,20 +53,23 @@ export class WalletService {
       throw new Error('Wallet not found');
     }
   
-    console.log(`Money added to wallet: ${wallet}`);
+    //console.log(`Money added to wallet: ${wallet}`);
   }
 
   async getWalletBalance(user_id: string): Promise<number> {
-    console.log('entra a get wallet balance id:', user_id);
-    const wallet = await this.walletModel.findOne({ user_id });
+    //console.log('entra a get wallet balance id:', user_id);
+    // Convertir user_id a ObjectId
+    const objectId = new Types.ObjectId(user_id);
+
+    const wallet = await this.walletModel.findOne({ objectId });
     if (!wallet) {
-      throw new Error('Wallet not found');
+      throw new NotFoundException('Wallet not found');
     }
     return wallet.money;
   }
 
   async findAll(): Promise<Wallet[]> {
-    console.log('entra al get findAll wallets');
+    //console.log('entra al get findAll wallets');
     return await this.walletModel.find().exec();
   }
 }
