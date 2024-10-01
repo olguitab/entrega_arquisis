@@ -10,7 +10,7 @@ export class FixturesController {
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
       const { message } = requestBody;
-      console.log('Received request body process fixtures:', message.fixtures);
+      //('Received request body process fixtures:', message.fixtures);
       
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format in processFixtures:', requestBody);
@@ -19,16 +19,6 @@ export class FixturesController {
           message: 'Invalid data format',
         };
       }
-
-      /*
-      const fixtures = message.fixtures;
-      console.log('Processing fixtures:', fixtures);
-
-      //const savedFixtures = await this.fixtureService.createFixtures(fixtures);
-      const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-      console.log('Saved fixtures:', savedFixtures);
-      */
-
       const savedFixtures = await this.processFixturesData(message.fixtures);
       
 
@@ -66,7 +56,7 @@ export class FixturesController {
     //console.log('Processing fixtures:', fixtures);
 
     const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-    console.log('Saved fixtures:', savedFixtures);
+    //console.log('Saved fixtures:', savedFixtures);
 
     return savedFixtures;
   }
@@ -74,7 +64,7 @@ export class FixturesController {
   @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      console.log('Enter patch for history');
+      //console.log('Enter patch for history');
       const { message } = requestBody;
   
       // Usar la función de validación
@@ -85,8 +75,7 @@ export class FixturesController {
 
       const updatedFixtures = await this.fixtureService.processHistoryFixtures(message.fixtures);
   
-      // Lógica adicional específica para 'history'
-      console.log('Additional processing for history...');
+      //console.log('Additional processing for history...');
       // acá filtrar los ids y buscar bonos comprados de esos partidos, mandar los savedFixtures
       // allá procesar según ids de partidos y actualizar bonos que estén con estado pendiente
   

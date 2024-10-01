@@ -70,7 +70,9 @@ let FixturesController = class FixturesController {
                 return validation.error;
             }
             const savedFixtures = await this.processFixturesData(message);
-            console.log('Additional processing for history...');
+            //console.log('Additional processing for history...');
+
+            //quizás acá procesar la actualización de bonos comprados
             return;
         }
         catch (error) {

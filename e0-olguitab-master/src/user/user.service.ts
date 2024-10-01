@@ -14,13 +14,11 @@ export class UsersService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    console.log('entra a create user');
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const createdUser = new this.userModel({ ...createUserDto, password: hashedPassword });
     // Guardar el usuario en la base de datos
     await createdUser.save();
     // función crear wallet
-    console.log('entra a create wallet');
     await this.walletService.createWallet(createdUser._id as Types.ObjectId);
     return createdUser.toObject(); // Asegúrate de devolver el objeto después de guardarlo
   }
