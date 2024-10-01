@@ -27,10 +27,6 @@ jobs:
         with:
           node-version: 18
 
-      # Paso 3: Navegar al directorio del proyecto
-      - name: Change to project directory
-        run: cd e0-olguitab-master
-
       # Paso 4: Instalar dependencias
       - name: Install dependencies
         run: |
@@ -38,8 +34,8 @@ jobs:
           npm install
 
       # Paso 5: Linting
-      - name: Install dependencies
+      - name: Run Lint
         run: |
           cd e0-olguitab-master
-          npm install
+          npm run lint
 
