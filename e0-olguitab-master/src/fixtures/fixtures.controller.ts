@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException, Patch } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 
 @Controller('fixtures')
@@ -13,7 +13,7 @@ export class FixturesController {
       const { message } = requestBody;
 
       if (!message || !Array.isArray(message.fixtures)) {
-        console.log('Invalid data format:', requestBody);
+        console.log('Invalid data format in processFixtures:', requestBody);
         return {
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Invalid data format',
@@ -71,10 +71,10 @@ export class FixturesController {
     return savedFixtures;
   }
 
-  @Post('history')
+  @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      //console.log('Received request body for history:', requestBody);
+      console.log('Enter patch for history');
       const { message } = requestBody;
   
       // Usar la función de validación
@@ -83,7 +83,7 @@ export class FixturesController {
         return validation.error;
       }
 
-      const savedFixtures = await this.processFixturesData(message);
+      const updatedFixtures = await this.fixtureService.processHistoryFixtures(message.fixtures);
   
       // Lógica adicional específica para 'history'
       console.log('Additional processing for history...');

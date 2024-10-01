@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from 'user/user.schema';
 import { Wallet } from './wallet.schema';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WalletService {
@@ -65,9 +66,12 @@ export class WalletService {
 
   async getWalletBalance(user_id: string): Promise<number> {
     console.log('entra a get wallet balance id:', user_id);
-    const wallet = await this.walletModel.findOne({ user_id });
+    // Convertir user_id a ObjectId
+    const objectId = new Types.ObjectId(user_id);
+
+    const wallet = await this.walletModel.findOne({ objectId });
     if (!wallet) {
-      throw new Error('Wallet not found');
+      throw new NotFoundException('Wallet not found');
     }
     return wallet.money;
   }
