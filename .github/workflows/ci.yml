@@ -5,12 +5,10 @@ on:
     branches:
       - main
       - develop
-      - aplicando-fix-lint
   pull_request:
     branches:
       - main
       - develop
-      - aplicando-fix-lint
 
 jobs:
   linting:
