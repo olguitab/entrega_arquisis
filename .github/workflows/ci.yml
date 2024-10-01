@@ -1,41 +1,56 @@
-name: Run Lint
+name: Run Lint and Test
 
 on:
   push:
     branches:
       - main
       - develop
-      - aplicando-fix-lint
   pull_request:
     branches:
       - main
       - develop
-      - aplicando-fix-lint
 
 jobs:
   linting:
     runs-on: ubuntu-latest
 
     steps:
-      # Paso 1: Checkout del repositorio
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Paso 2: Configurar Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Paso 3: Instalar dependencias
       - name: Install dependencies
         run: |
           cd e0-olguitab-master
           npm install
 
-      # Paso 4: Linting
       - name: Run Lint
         run: |
           cd e0-olguitab-master
           npm run lint
+  
+  trivial-test:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd e0-olguitab-master
+          npm install
+
+      - name: Run trivial test
+        run: |
+          cd e0-olguitab-master
+          npm run test -- --findRelatedTests src/app.service.spec.ts
