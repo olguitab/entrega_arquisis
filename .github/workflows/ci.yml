@@ -43,21 +43,3 @@ jobs:
           cd e0-olguitab-master
           npm install
 
-      """
-      # Paso 5: Compilar la aplicación
-      - name: Build the application
-        run: npm run build
-
-      # Paso 6: Ejecutar pruebas unitarias
-      - name: Run unit tests
-        run: npm run test
-
-      # Paso 7: Analizar cobertura de pruebas
-      - name: Test coverage
-        run: npm run test:cov
-
-      # Paso 8: Ejecutar pruebas End-to-End
-      - name: Run end-to-end tests
-        run: npm run test:e2e
-      """
-
