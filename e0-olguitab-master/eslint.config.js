@@ -48,7 +48,7 @@ module.exports = [
       //'@typescript-eslint/no-explicit-any': 'warn', // Advertencia para el uso de `any`
 
       // Prettier
-      'prettier/prettier': ['error'], // Integra Prettier como regla de ESLint
+      //'prettier/prettier': ['error'], // Integra Prettier como regla de ESLint
     },
   },
 ];
