@@ -1,0 +1,26 @@
+{
+  "name": "e0-olguitab-master",
+  "version": "1.0.0",
+  "description": "Para correr api nestjs, hay que dirigirse a ./app y usar el comando npm run start",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint 'mqtt-service/**/*.js' 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.js' 'src/**/*.ts' --fix",
+    "format": "prettier --write 'mqtt-service/**/*.{js,json}' 'src/**/*.{ts,json}'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3"
+  }
+}
