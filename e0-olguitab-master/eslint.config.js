@@ -43,9 +43,9 @@ module.exports = [
       'prefer-const': 'error', // Sugiere `const` en lugar de `let` para variables no reasignadas
 
       // Reglas específicas para TypeScript (si usas TypeScript)
-      '@typescript-eslint/no-unused-vars': ['warn'], // Advertencia para variables no usadas en TypeScript
-      '@typescript-eslint/explicit-function-return-type': 'off', // Desactiva requerir tipo explícito de retorno en funciones
-      '@typescript-eslint/no-explicit-any': 'warn', // Advertencia para el uso de `any`
+      //'@typescript-eslint/no-unused-vars': ['warn'], // Advertencia para variables no usadas en TypeScript
+      //'@typescript-eslint/explicit-function-return-type': 'off', // Desactiva requerir tipo explícito de retorno en funciones
+      //'@typescript-eslint/no-explicit-any': 'warn', // Advertencia para el uso de `any`
 
       // Prettier
       'prettier/prettier': ['error'], // Integra Prettier como regla de ESLint
