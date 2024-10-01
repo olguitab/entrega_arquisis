@@ -7,18 +7,6 @@ import { Fixture } from './fixtures.schema';
 export class FixtureService {
   constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>) {}
 
-    /*
-  async createFixtures(fixturesData: any[]): Promise<any[]> {
-    const savedFixtures = await Promise.all(
-      fixturesData.map(async (fixtureData) => {
-        const fixture = new this.fixtureModel(fixtureData);
-        return await fixture.save();
-      }),
-    );
-    return savedFixtures;
-  }
-    */
-
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
@@ -69,7 +57,7 @@ export class FixtureService {
         return await this.fixtureModel.findOneAndUpdate(
           { 'fixture.id': fixtureId }, 
           { $set: fixtureData }, // actualiza solo los campos que se pasan desde history
-          { new: true, upsert: true } // no crear fixture si no existe
+          { new: true, upsert: false } // no crear fixture si no existe
         ).exec();
       })
     );
