@@ -21,7 +21,6 @@ let FixturesController = class FixturesController {
     }
     async processFixtures(requestBody) {
         try {
-            console.log('Received request body:', requestBody);
             const { message } = requestBody;
             if (!message || !Array.isArray(message.fixtures)) {
                 console.log('Invalid data format:', requestBody);
@@ -30,10 +29,7 @@ let FixturesController = class FixturesController {
                     message: 'Invalid data format',
                 };
             }
-            const fixtures = message.fixtures;
-            console.log('Processing fixtures:', fixtures);
-            const savedFixtures = await this.fixtureService.createFixtures(fixtures);
-            console.log('Saved fixtures:', savedFixtures);
+            const savedFixtures = await this.processFixturesData(message.fixtures);
             return {
                 statusCode: common_1.HttpStatus.CREATED,
                 message: 'Fixtures created successfully',
@@ -42,6 +38,45 @@ let FixturesController = class FixturesController {
         }
         catch (error) {
             console.error('Error processing fixtures:', error);
+            return {
+                statusCode: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+                message: 'Internal Server Error',
+            };
+        }
+    }
+    validateMessage(message) {
+        if (!message || !Array.isArray(message.fixtures)) {
+            console.log('Invalid data format:', message);
+            return {
+                isValid: false,
+                error: {
+                    statusCode: common_1.HttpStatus.BAD_REQUEST,
+                    message: 'Invalid data format',
+                },
+            };
+        }
+        return { isValid: true };
+    }
+    async processFixturesData(fixtures) {
+        const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
+        console.log('Saved fixtures:', savedFixtures);
+        return savedFixtures;
+    }
+    async processHistoryFixtures(requestBody) {
+        try {
+            const { message } = requestBody;
+            const validation = this.validateMessage(message);
+            if (!validation.isValid) {
+                return validation.error;
+            }
+            const savedFixtures = await this.processFixturesData(message);
+            //console.log('Additional processing for history...');
+
+            //quizás acá procesar la actualización de bonos comprados
+            return;
+        }
+        catch (error) {
+            console.error('Error processing fixture history:', error);
             return {
                 statusCode: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'Internal Server Error',
@@ -106,6 +141,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], FixturesController.prototype, "processFixtures", null);
+__decorate([
+    (0, common_1.Post)('history'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], FixturesController.prototype, "processHistoryFixtures", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
