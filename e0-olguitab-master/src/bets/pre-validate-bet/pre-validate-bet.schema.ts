@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { User } from 'user/user.schema';
+import { Types } from 'mongoose';
 
 export const PreValidateBetSchema = new mongoose.Schema({
   request_id: { type: String, required: true },
@@ -13,5 +13,5 @@ export const PreValidateBetSchema = new mongoose.Schema({
   datetime: String,
   quantity: Number,
   seller: { type: Number, default: 0 },
-  user_id: User,
+  user_id: Types.ObjectId,
 });

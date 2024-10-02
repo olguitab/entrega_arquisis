@@ -25,6 +25,7 @@ export class ValidateBetController {
       // Obtener el id del usuario que solicitó el bono
       const preValidateBet = await this.preValidateBetService.findOne(message.request_id);
       const user_id = preValidateBet.user_id;
+      console.log("The user id of the buyer is", user_id);
     
 
       // Extrae los datos del mensaje y los mapea al esquema esperado
