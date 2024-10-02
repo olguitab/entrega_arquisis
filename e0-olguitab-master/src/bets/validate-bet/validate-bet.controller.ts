@@ -1,10 +1,11 @@
 import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { ValidateBetService } from './validate-bet.service';
+import { PreValidateBetService } from '../pre-validate-bet/pre-validate-bet.service';
 // import { ValidateBet } from './validate-bet.interface';
 
 @Controller('validate-bet')
 export class ValidateBetController {
-  constructor(private readonly validateBetService: ValidateBetService) {}
+  constructor(private readonly validateBetService: ValidateBetService, private readonly preValidateBetService: PreValidateBetService) {}
 
   @Post()
   async processFixtures(@Body() requestBody: any): Promise<any> {
@@ -21,13 +22,26 @@ export class ValidateBetController {
         };
       }
 
+      // Obtener el id del usuario que solicitó el bono
+      const preValidateBet = await this.preValidateBetService.findOne(message.request_id);
+      const user_id = preValidateBet.user_id;
+    
+
       // Extrae los datos del mensaje y los mapea al esquema esperado
       const validateBetData = {
         request_id: message.request_id,
         group_id: message.group_id.toString(), // Convierte group_id a String si es necesario
         seller: message.seller,
         valid: message.valid,
-      };
+        user_id : user_id,
+      }
+
+      console.log('Checking bet validation')
+      if (!(validateBetData.valid === true && validateBetData.group_id === 23)) {
+        console.log('The bet request is not ours or is not valid')
+        return;
+      }
+
       console.log('Processing validate bet data:', validateBetData);
 
       // Guarda los datos en la base de datos

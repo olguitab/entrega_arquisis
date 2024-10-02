@@ -8,7 +8,7 @@ const client = mqtt.connect(process.env.MQTT_BROKER_URL, {
 
 client.on('connect', () => {
   console.log('Connected to MQTT Broker');
-  // Suscribirse a ambos topics necesarios
+  // Suscribirse a topics necesarios
   client.subscribe('fixtures/info', (err) => {
     if (err) {
       console.error('Subscription error:', err);
@@ -51,6 +51,7 @@ client.on('message', async (topic, message) => {
       await axios.post(`${process.env.APP_URL}/validate-bet`, {
         topic,
         message: parsedMessage,
+        // tengo q tb agregarle el user_id (sacarlo del pre-validate y entregarselo al validate)
       });
     } catch (error) {
       console.error('Error processing MQTT message:', error);
@@ -110,11 +111,11 @@ async function fetchAndPublish() {
     const messageString = JSON.stringify(getInfoResponse.data);
 
     // Publica el mensaje a MQTT y luego realiza la solicitud POST
-    client.publish('fixtures/request', messageString, {}, async (err) => {
+    client.publish('fixtures/requests', messageString, {}, async (err) => {
       if (err) {
         console.error('Error publishing message:', err);
       } else {
-        console.log('Message published to fixtures/request');
+        console.log('Message published to fixtures/requests');
         try {
           // Realiza la solicitud POST con los detalles de la apuesta
           console.log('Bet placed successfully:', messageString);

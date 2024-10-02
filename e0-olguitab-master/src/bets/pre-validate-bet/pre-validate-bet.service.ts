@@ -17,10 +17,15 @@ export class PreValidateBetService {
   async findAll(): Promise<PreValidateBet[]> {
     return this.preValidateBetModel.find().exec();
   }
+
   async deleteAll(): Promise<void> {
     // Aquí asumimos que tienes un método o forma de eliminar todos los registros
     await this.preValidateBetModel.deleteMany({});
     console.log('Todos los datos de PreValidateBet han sido eliminados.');
+  }
+
+  async findOne(request_id: string): Promise<PreValidateBet | undefined> {
+    return this.preValidateBetModel.findOne({ request_id }).exec();
   }
 
   // Agrega aquí más métodos según sea necesario

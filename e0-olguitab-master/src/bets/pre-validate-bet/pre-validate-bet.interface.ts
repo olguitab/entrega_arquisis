@@ -1,5 +1,6 @@
 // interfaces/pre-validate-bet.interface.ts
 import { Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface PreValidateBet extends Document {
   request_id: string;
@@ -13,4 +14,5 @@ export interface PreValidateBet extends Document {
   datetime: string;
   quantity: number;
   seller: number;
+  user_id: Types.ObjectId,
 }
