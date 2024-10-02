@@ -1,4 +1,3 @@
-// pre-validate-bet.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -10,10 +9,11 @@ export class ValidateBetService {
     @InjectModel('ValidateBet') private readonly ValidateBetModel: Model<ValidateBet>,
   ) {}
 
-  async create(createValidateBetDto: ValidateBet): Promise<ValidateBet> {
-    const createdBet = new this.ValidateBetModel(createValidateBetDto);
-    return createdBet.save();
-  }
+// En validate-bet.service.ts
+async create(validateBetData: any): Promise<any> {
+  const createdValidateBet = new this.ValidateBetModel(validateBetData);
+  return createdValidateBet.save();
+}
 
   async findAll(): Promise<ValidateBet[]> {
     return this.ValidateBetModel.find().exec();

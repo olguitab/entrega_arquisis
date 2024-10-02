@@ -1,4 +1,3 @@
-// pre-validate-bet.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -17,6 +16,11 @@ export class PreValidateBetService {
 
   async findAll(): Promise<PreValidateBet[]> {
     return this.preValidateBetModel.find().exec();
+  }
+  async deleteAll(): Promise<void> {
+    // Aquí asumimos que tienes un método o forma de eliminar todos los registros
+    await this.preValidateBetModel.deleteMany({});
+    console.log('Todos los datos de PreValidateBet han sido eliminados.');
   }
 
   // Agrega aquí más métodos según sea necesario

@@ -1,4 +1,3 @@
-// pre-validate-bet.dto.ts
 import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class ValidateBetDto {
@@ -9,10 +8,10 @@ export class ValidateBetDto {
   @IsNotEmpty()
   group_id: string;
 
+  @IsNumber()
+  seller: number;
 
   @IsBoolean()
   valid: string;
 
-  @IsNumber()
-  seller: number;
 }

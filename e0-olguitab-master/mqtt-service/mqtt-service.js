@@ -28,6 +28,7 @@ client.on('connect', () => {
       console.error('Subscription error (fixtures/history):', err);
     } else {
       console.log('Subscribed to topic: fixtures/history');
+
     }
   });
 });
@@ -38,8 +39,15 @@ client.on('message', async (topic, message) => {
   if (topic === 'fixtures/validation') {
     try {
       const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message on fixtures/validation, sending to app...');
+      console.log('Recibiendo validación...');
+      const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
 
+      // Verificar si la respuesta está vacía. Ajusta esta condición según lo que esperes como respuesta vacía.
+      if (getInfoResponse.data.length === 0) {
+        // Si está vacío, simplemente no hagas nada y retorna o sigue con otra lógica.
+        console.log('No hay datos para procesar.');
+        return;
+      }
       await axios.post(`${process.env.APP_URL}/validate-bet`, {
         topic,
         message: parsedMessage,
@@ -61,7 +69,14 @@ client.on('message', async (topic, message) => {
     } catch (error) {
       console.error('Error processing MQTT message:', error);
     }
-  } else if (topic === 'fixtures/history') {
+  } //else if (topic === 'fixtures/request') {
+
+  //}
+  
+  
+  
+  
+  else if (topic === 'fixtures/history') {
     // Procesar mensajes de fixtures/history como antes
     // ver si se puede reutilizar código en el fixture.controller/service y ver cómo se podrían guardar 
         // de forma distinta los datos de history y de info (presente/futuro), se manda el topic así que se podría filtrar
@@ -87,33 +102,33 @@ client.on('message', async (topic, message) => {
 
 
 async function fetchAndPublish() {
-    try {
-      // Primero, realiza una solicitud GET para obtener la información necesaria
-      const getInfoResponse = await axios.get(`http://127.0.0.1:3001/pre-validate-bet`);
-      console.log('Información obtenida con éxito:', getInfoResponse.data);
-      const message = JSON.stringify(getInfoResponse);
-  
-      // Publica el mensaje a MQTT y luego realiza la solicitud POST
-      client.publish('fixtures/request', message, {}, async (err) => {
-        if (err) {
-          console.error('Error publishing message:', err);
-        } else {
-          console.log('Message published to fixtures/request');
-          try {
-            // Realiza la solicitud POST con los detalles de la apuesta
-            const postResponse = await axios.post(`${process.env.APP_URL}/fixtures/request`, betDetails);
-            console.log('Bet placed successfully:', postResponse.data);
-          } catch (postError) {
-            console.error('Error placing bet:', postError);
-          }
+  try {
+    // Primero, realiza una solicitud GET para obtener la información necesaria
+    const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
+    console.log('Información obtenida con éxito:', getInfoResponse.data);
+
+    const messageString = JSON.stringify(getInfoResponse.data);
+
+    // Publica el mensaje a MQTT y luego realiza la solicitud POST
+    client.publish('fixtures/request', messageString, {}, async (err) => {
+      if (err) {
+        console.error('Error publishing message:', err);
+      } else {
+        console.log('Message published to fixtures/request');
+        try {
+          // Realiza la solicitud POST con los detalles de la apuesta
+          console.log('Bet placed successfully:', messageString);
+        } catch (postError) {
+          console.error('Error placing bet:', postError);
         }
-      });
-      setTimeout(fetchAndPublish, 100000);
-    } catch (getError) {
-      console.error('Error obteniendo información:', getError);
-      setTimeout(fetchAndPublish, 100000);
-    }
-  
+      }
+    });
+    setTimeout(fetchAndPublish, 120000);
+  } catch (getError) {
+    console.error('Error obteniendo información:', getError);
+    setTimeout(fetchAndPublish, 120000);
+  }
+
 }
 
 

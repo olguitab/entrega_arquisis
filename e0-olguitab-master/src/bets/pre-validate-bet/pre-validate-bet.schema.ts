@@ -1,4 +1,3 @@
-// schemas/pre-validate-bet.schema.ts
 import * as mongoose from 'mongoose';
 
 export const PreValidateBetSchema = new mongoose.Schema({

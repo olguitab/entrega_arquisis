@@ -25,7 +25,7 @@ services:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
       - MQTT_PASSWORD=iic2173-2024-2-students
-      - APP_URL=http://app1:3000  # Cambia esto a app1 o app2 según el servicio que desees
+      - APP_URL=http://app1:3001  # Cambia esto a app1 o app2 según el servicio que desees
     ports:
       - "1884:1884"
     networks:

@@ -13,5 +13,4 @@ export const BetSchema = new mongoose.Schema({
   quantity: Number,
   seller: Number,
 });
-
 export const BetModel = mongoose.model('Bet', BetSchema);
