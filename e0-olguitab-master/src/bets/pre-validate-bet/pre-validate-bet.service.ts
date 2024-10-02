@@ -10,6 +10,12 @@ export class PreValidateBetService {
     @InjectModel('PreValidateBet') private readonly preValidateBetModel: Model<PreValidateBet>,
   ) {}
 
+  async findByIdRequest(idRequest: string): Promise<PreValidateBet> {
+    return await this.preValidateBetModel.findOne({
+      where: { request_id: idRequest },
+    });
+  }
+
   async create(createPreValidateBetDto: PreValidateBet): Promise<PreValidateBet> {
     const createdBet = new this.preValidateBetModel(createPreValidateBetDto);
     return createdBet.save();

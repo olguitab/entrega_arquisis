@@ -2,6 +2,7 @@
 import { Document } from 'mongoose';
 
 export interface PreValidateBet extends Document {
+  id_usuario: number;
   request_id: string;
   group_id: string;
   fixture_id: number;

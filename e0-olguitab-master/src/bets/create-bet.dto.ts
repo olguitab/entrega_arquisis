@@ -11,4 +11,7 @@ export class CreateBetDto {
     readonly datetime: string;
     readonly quantity: number;
     readonly seller: number;
+    ipAddress?: string; // Dirección IP del usuario
+    country?: string;  // País obtenido de la IP
+    city?: string;
   }

@@ -12,6 +12,9 @@ interface Bet {
     datetime: string;
     quantity: number;
     seller: number;
+    ipAddress?: string; // Dirección IP del usuario
+    country?: string;  // País obtenido de la IP
+    city?: string;
   }
 
   export default Bet;

@@ -1,9 +1,12 @@
 // src/bet/bet.controller.ts
-import { Body, Controller, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { BetService } from './bets.service';
 import { CreateBetDto } from './create-bet.dto';
 import Bet from './bet.interface';
-import { PreValidateBetDto } from './pre-validate-bet/pre-validate-bet.dto';
+import { getLocationFromIP } from './location';
+import { HttpStatus } from '@nestjs/common'; // Asegúrate de que la ruta de importación sea correcta
+
 
 @Controller('api/bet')
 export class BetController {
@@ -13,62 +16,35 @@ export class BetController {
   findAll(): Promise<Bet[]> {
     return this.betService.findAll();
   }
-  @Get('processvalidate')
-  async getProcessedFixtures(): Promise<any> {
+
+  @Post()
+  async create(@Body() createBetDto: CreateBetDto, @Req() request: Request): Promise<Bet> {
+    // Intenta obtener la dirección IP del cliente de varias maneras, priorizando 'x-forwarded-for'
+    let ipAddress = request.headers['x-forwarded-for'] || request.ip || request.connection.remoteAddress;
+
+    if (Array.isArray(ipAddress)) {
+      ipAddress = ipAddress[0];
+    }
+
+
+
+    // Si ipAddress todavía es un array o undefined, asegúrate de que se convierta en un string vacío o maneja según sea necesario
+    if (typeof ipAddress !== 'string') {
+      console.error('No se pudo determinar la dirección IP del cliente.');
+      throw new Error('No se pudo determinar la dirección IP del cliente.');
+    }
+
     try {
-      // Aquí necesitarías implementar la lógica para recuperar y devolver los datos deseados.
-      // Por ejemplo, recuperar las últimas apuestas procesadas/validadas desde tu servicio.
-      const processedBets = await this.betService.findAll();
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'Processed bets retrieved successfully',
-        data: processedBets,
-      };
+      // Obtiene la ubicación a partir de la dirección IP y la asigna al DTO
+      const location = await getLocationFromIP(ipAddress);
+      createBetDto.ipAddress = ipAddress; // Asegúrate de que tu DTO pueda aceptar la dirección IP
+      createBetDto.country = location.country_name; // Asegúrate de que tu DTO y esquema de base de datos puedan aceptar estos campos
+      createBetDto.city = location.city;
     } catch (error) {
-      console.error('Error retrieving processed bets:', error);
-      return {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Internal Server Error',
-      };
+      console.error('Error al obtener la ubicación:', error);
+      // Maneja el error según sea necesario
     }
-  }
-
-  @Post() 
-  async create(@Body() createprevet: PreValidateBetDto){
-    // Asegúrate de que betDetails esté correctamente formado a partir de createBetDto
-    const betDetails = {
-      ...createprevet,
-      // Aquí puedes agregar o modificar propiedades según sea necesario
-    };
-
-  }
-
-  @Post('processvalidate')
-  async processValidate(@Body() body): Promise<any> {
-    const { topic, message } = body;
-
-    // Filtrar por group_id "23"
-    if (message.group_id === "23") {
-      try {
-        // Lógica para buscar en la tabla pre-validate-bet por request_id y marcar como bet
-        const result = await this.betService.validateAndCreateBet(message);
-        return {
-          statusCode: HttpStatus.OK,
-          message: 'Bet processed successfully',
-          data: result,
-        };
-      } catch (error) {
-        console.error('Error processing bet:', error);
-        return {
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Internal Server Error',
-        };
-      }
-    } else {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Group ID not matched',
-      };
-    }
+    
+    return this.betService.createbet(createBetDto);
   }
 }
