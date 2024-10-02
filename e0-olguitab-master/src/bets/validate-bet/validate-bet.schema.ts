@@ -1,4 +1,3 @@
-
 import * as mongoose from 'mongoose';
 
 export const ValidateBetSchema = new mongoose.Schema({
@@ -7,4 +6,3 @@ export const ValidateBetSchema = new mongoose.Schema({
   seller: Number,
   valid: Boolean,
 });
-

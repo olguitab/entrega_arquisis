@@ -2,7 +2,7 @@ import { Schema, Document } from 'mongoose';
 
 export const FixtureSchema = new Schema({
   fixture: {
-    id: Number,
+    id: { type: Number, unique: true, required: true },
     referee: String,
     timezone: String,
     date: { type: Date, required: true },

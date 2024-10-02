@@ -1,4 +1,3 @@
-// pre-validate-bet.dto.ts
 import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class ValidateBetDto {

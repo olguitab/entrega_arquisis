@@ -6,10 +6,15 @@ import { FixtureService } from './fixtures/fixtures.service';
 import { InitializationService } from 'initialization/initialization.service';
 import { UsersModule } from 'user/user.module';
 import { BetModule } from 'bets/bets.module';
+
+import { FixturesModule } from 'fixtures/fixtures.module';
+import { BetSchema } from 'bets/bet.schema';
 import { PreValidateBetModule } from 'bets/pre-validate-bet/pre-validate-bet.module';
-import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
 import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
 import { WalletModule } from 'wallet/wallet.module';
+
+import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
+
 
 @Module({
   imports: [
@@ -17,6 +22,7 @@ import { WalletModule } from 'wallet/wallet.module';
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
     UsersModule,
     BetModule,
+    FixturesModule,
     PreValidateBetModule,
     ValidateBetModule,
     WalletModule,

@@ -36,15 +36,6 @@ export class WalletService {
     console.log(`Wallet creada para el usuario: ${user_id}`);
   }
 
-  /*
-
-
-  async addMoneyToWallet(user_id: Types.ObjectId, amount: number): Promise<void> {
-    await this.walletModel.updateOne({ user_id }, { $inc: { money: amount } });
-  }
-  */
-
-
   async addMoneyToWallet(user_id: string, amount: number): Promise<void> {
     console.log(`entra a add ${amount} money to wallet id: ${user_id}`);
   

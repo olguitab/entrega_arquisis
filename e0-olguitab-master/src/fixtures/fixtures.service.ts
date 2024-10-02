@@ -7,18 +7,6 @@ import { Fixture } from './fixtures.schema';
 export class FixtureService {
   constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>) {}
 
-    /*
-  async createFixtures(fixturesData: any[]): Promise<any[]> {
-    const savedFixtures = await Promise.all(
-      fixturesData.map(async (fixtureData) => {
-        const fixture = new this.fixtureModel(fixtureData);
-        return await fixture.save();
-      }),
-    );
-    return savedFixtures;
-  }
-    */
-
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
@@ -57,4 +45,25 @@ export class FixtureService {
     }
     return fixture;
   }
+
+  async processHistoryFixtures(fixturesData: any[]): Promise<any[]> {
+    // esta función va a actualizar las fixtures existentes cambiando sus datoss
+    //console.log('Fixtures a actualizar:', fixturesData);
+    const updatedFixtures = await Promise.all(
+      fixturesData.map(async (fixtureData) => {
+        const fixtureId = fixtureData.fixture.id;
+  
+        return await this.fixtureModel.findOneAndUpdate(
+          { 'fixture.id': fixtureId }, 
+          { $set: fixtureData }, // actualiza solo los campos que se pasan desde history
+          { new: true, upsert: false } // no crear fixture si no existe
+        ).exec();
+      })
+    );
+    //console.log('Fixtures actualizadas:', updatedFixtures.length);
+  
+    return updatedFixtures; 
+  }
+  
+
 }

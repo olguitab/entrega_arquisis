@@ -1,6 +1,5 @@
 import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { ValidateBetService } from './validate-bet.service';
-// Asegúrate de tener la interfaz correcta importada si la estás usando
 // import { ValidateBet } from './validate-bet.interface';
 
 @Controller('validate-bet')
