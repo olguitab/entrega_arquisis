@@ -5,12 +5,13 @@ import { Fixture } from './fixtures.schema';
 import { BetService } from 'bets/bets.service';
 import { first } from 'rxjs';
 import { WalletService } from 'wallet/wallet.service';
+import { UsersService } from 'user/user.service';
 
 @Injectable()
 export class FixtureService {
   constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>,
   private readonly betService: BetService,
-  private readonly walletService: WalletService) {}
+  private readonly usersService: UsersService) {}
 
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
     const updatedFixtures = await Promise.all(
@@ -171,7 +172,9 @@ export class FixtureService {
               //console.log('Bono ganado:', bet);
               bet.status = 'won';
               const money = bet.quantity * 1000 * odd;
-              await this.walletService.addMoneyToWallet(bet.id_usuario, money);
+              //await this.walletService.addMoneyToWallet(bet.id_usuario, money);
+              // añadir dinero a la billetera en el user
+              await this.usersService.addMoneyToUser(bet.id_usuario, money);
             }
             else {
               bet.status = 'lost';

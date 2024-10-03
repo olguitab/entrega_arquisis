@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './user.schema'; // Verifica que la ruta sea correcta
@@ -10,7 +10,7 @@ import { WalletService } from 'wallet/wallet.service';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private walletService: WalletService,
+    @Inject(forwardRef(() => WalletService)) private walletService: WalletService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -41,4 +41,8 @@ export class UsersService {
     return this.userModel.find().exec();
   }
   // Puedes agregar más métodos para consultar, actualizar o eliminar usuarios
+
+  async addMoneyToUser(userId: string, amount: number): Promise<void> {
+    await this.walletService.addMoneyToWallet(userId, amount);
+  }
 }

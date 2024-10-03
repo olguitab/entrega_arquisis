@@ -10,10 +10,10 @@ import { WalletModule } from 'wallet/wallet.module';
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     forwardRef(() => AuthModule),
-    WalletModule,
+    forwardRef(() => WalletModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService] // Exporta el servicio si necesitas usarlo fuera de este módulo
+  exports: [UsersService, MongooseModule] // Exporta el servicio si necesitas usarlo fuera de este módulo
 })
 export class UsersModule {}
