@@ -9,6 +9,11 @@ export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
 ) {}
 
+// En tu archivo bets.service.ts o como lo hayas nombrado
+
+async findBetsByUserId(userId: string): Promise<Bet[]> {
+  return this.betModel.find({ id_usuario: userId }).exec();
+}
   async findAll(): Promise<Bet[]> {
     return this.betModel.find().exec();
   }
