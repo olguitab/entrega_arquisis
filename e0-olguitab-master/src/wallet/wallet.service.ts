@@ -63,8 +63,10 @@ export class WalletService {
   
     console.log(`Money added to wallet: ${wallet}`);
   }
-  async findByUserId(userId: string): Promise<Wallet> {
-    return this.walletModel.findOne({ user_id: userId }).populate('user_id').exec();
+  async findByUserId(userId: string): Promise<Wallet | null> {
+    const objectId = new Types.ObjectId(userId);
+    const wallet = await this.walletModel.findOne({ user_id: objectId });
+    return wallet;
   }
   
   async updateMoney(walletId: string, newMoneyValue: number): Promise<Wallet> {
