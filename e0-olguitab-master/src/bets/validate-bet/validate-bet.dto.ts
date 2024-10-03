@@ -9,10 +9,10 @@ export class ValidateBetDto {
   @IsNotEmpty()
   group_id: string;
 
+  @IsNumber()
+  seller: number;
 
   @IsBoolean()
   valid: string;
 
-  @IsNumber()
-  seller: number;
 }

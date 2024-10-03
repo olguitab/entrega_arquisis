@@ -11,9 +11,8 @@ export class PreValidateBetService {
   ) {}
 
   async findByIdRequest(idRequest: string): Promise<PreValidateBet> {
-    return await this.preValidateBetModel.findOne({
-      where: { request_id: idRequest },
-    });
+    console.log('Buscando por request_id:', idRequest);
+    return await this.preValidateBetModel.findOne({ request_id: idRequest });
   }
 
   async create(createPreValidateBetDto: PreValidateBet): Promise<PreValidateBet> {
@@ -23,6 +22,11 @@ export class PreValidateBetService {
 
   async findAll(): Promise<PreValidateBet[]> {
     return this.preValidateBetModel.find().exec();
+  }
+  async deleteAll(): Promise<void> {
+    // Aquí asumimos que tienes un método o forma de eliminar todos los registros
+    await this.preValidateBetModel.deleteMany({});
+    console.log('Todos los datos de PreValidateBet han sido eliminados.');
   }
 
   // Agrega aquí más métodos según sea necesario

@@ -2,7 +2,7 @@
 import * as mongoose from 'mongoose';
 
 export const PreValidateBetSchema = new mongoose.Schema({
-  id_usuario: Number,
+  id_usuario: String,
   request_id: { type: String, required: true },
   group_id: String,
   fixture_id: Number,

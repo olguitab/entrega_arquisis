@@ -25,8 +25,9 @@ let InitializationService = class InitializationService {
     }
     async cleanFixtures() {
         try {
-            await this.fixtureModel.deleteMany({});
-            console.log('Todos los datos de Fixtures han sido eliminados.');
+            //await this.fixtureModel.deleteMany({});
+            //console.log('Todos los datos de Fixtures han sido eliminados.');
+            console.log('Ya no se eliminan los datos de fixture :).');
         }
         catch (error) {
             console.error('Error al limpiar la colección Fixtures:', error);

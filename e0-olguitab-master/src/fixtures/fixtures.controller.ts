@@ -3,8 +3,7 @@ import { FixtureService } from './fixtures.service';
 
 @Controller('fixtures')
 export class FixturesController {
-  constructor(private readonly fixtureService: FixtureService,) {};
-
+  constructor(private readonly fixtureService: FixtureService) {}
 
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
@@ -23,7 +22,8 @@ export class FixturesController {
       const fixtures = message.fixtures;
       console.log('Processing fixtures:', fixtures);
 
-      const savedFixtures = await this.fixtureService.createFixtures(fixtures);
+      //const savedFixtures = await this.fixtureService.createFixtures(fixtures);
+      const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
       console.log('Saved fixtures:', savedFixtures);
 
       return {
@@ -39,7 +39,6 @@ export class FixturesController {
       };
     }
   }
-
 
   @Get(':id')
   async getFixtureById(@Param('id') id: string): Promise<any> {

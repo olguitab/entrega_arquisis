@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instala las dependencias
-RUN npm install --omit=optional
+RUN npm install
 
 # Copia el resto del código de la aplicación
 COPY . .
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Expone el puerto en el que la aplicación escucha
-EXPOSE 3000
+EXPOSE 3001
 
 # Comando para ejecutar la aplicación
 CMD ["npm", "run", "start:prod"]

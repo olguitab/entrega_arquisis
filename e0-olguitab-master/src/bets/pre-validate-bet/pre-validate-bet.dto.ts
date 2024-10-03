@@ -1,7 +1,11 @@
 // pre-validate-bet.dto.ts
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, isString, IsString, IsUUID } from 'class-validator';
 
 export class PreValidateBetDto {
+
+  @IsString()
+  id_usuario: string;
+
   @IsUUID()
   request_id: string;
 

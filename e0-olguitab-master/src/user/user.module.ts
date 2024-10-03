@@ -4,11 +4,13 @@ import { User, UserSchema } from './user.schema'; // Ajusta las rutas según tu 
 import { UsersController } from './user.controller';
 import { UsersService } from './user.service';
 import { AuthModule } from 'auth/auth.module';
+import { WalletModule } from 'wallet/wallet.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     forwardRef(() => AuthModule),
+    WalletModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

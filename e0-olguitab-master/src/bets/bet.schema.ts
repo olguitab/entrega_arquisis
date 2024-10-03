@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 
 export const BetSchema = new mongoose.Schema({
+  id_usuario: String,
   request_id: String,
   group_id: String,
   fixture_id: Number,
@@ -16,5 +17,3 @@ export const BetSchema = new mongoose.Schema({
   country: String, // País obtenido de la IP
   city: String,
 });
-
-export const BetModel = mongoose.model('Bet', BetSchema);

@@ -1,82 +1,85 @@
 const mqtt = require('mqtt');
 const axios = require('axios');
 
-const client = mqtt.connect(process.env.MQTT_BROKER_URL, {
-  username: process.env.MQTT_USERNAME,
-  password: process.env.MQTT_PASSWORD,
+// Asegúrate de tener definidas estas variables de entorno o reemplázalas con valores directos para pruebas.
+const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+const mqttUsername = process.env.MQTT_USERNAME;
+const mqttPassword = process.env.MQTT_PASSWORD;
+const appUrl = process.env.APP_URL;
+
+const client = mqtt.connect(mqttBrokerUrl, {
+  username: mqttUsername,
+  password: mqttPassword,
 });
 
 client.on('connect', () => {
   console.log('Connected to MQTT Broker');
-  // Suscribirse a ambos topics necesarios
-  client.subscribe(['fixtures/info', 'fixtures/validation'], (err) => {
+  client.subscribe(['fixtures/info', 'fixtures/validation', 'fixtures/request'], (err) => {
     if (err) {
       console.error('Subscription error:', err);
     } else {
-      console.log('Subscribed to topics: fixtures/info and fixtures/validation');
+      console.log('Subscribed to topics: fixtures/info, fixtures/request and fixtures/validation');
     }
   });
 });
 
 client.on('message', async (topic, message) => {
-  if (topic === 'fixtures/validation') {
-    try {
-      const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message, sending to app...');
+  try {
+    const parsedMessage = JSON.parse(message.toString());
+    console.log(`Received message on topic ${topic}`);
 
-      await axios.post(`${process.env.APP_URL}/validate-bet`, {
-        topic,
-        message: parsedMessage,
-      });
-    } catch (error) {
-      console.error('Error processing MQTT message:', error);
+    let endpoint = '';
+    switch (topic) {
+      case 'fixtures/validation':
+        endpoint = '/validate-bet';
+        break;
+      case 'fixtures/info':
+        endpoint = '/fixtures/process';
+        break;
+      /*case 'fixtures/requests':
+        endpoint = '/fixtures/request';
+        break;*/
+      default:
+        console.log(`No handler for topic ${topic}`);
+        return;
     }
-  } else if (topic === 'fixtures/info') {
-    // Procesar mensajes de fixtures/info como antes
-    try {
-      const parsedMessage = JSON.parse(message.toString());
-      console.log('Received message, sending to app...');
 
-      await axios.post(`${process.env.APP_URL}/fixtures/process`, {
-        topic,
-        message: parsedMessage,
-      });
-    } catch (error) {
-      console.error('Error processing MQTT message:', error);
-    }
+    const response = await axios.post(`${appUrl}${endpoint}`, {
+      topic,
+      message: parsedMessage,
+    });
+    console.log(`Data sent to ${endpoint}, response:`, response.data);
+  } catch (error) {
+    console.error('Error processing MQTT message:', error);
   }
 });
 
-
 async function fetchAndPublish() {
-    try {
-      // Primero, realiza una solicitud GET para obtener la información necesaria
-      const getInfoResponse = await axios.get(`http://127.0.0.1:3001/pre-validate-bet`);
-      console.log('Información obtenida con éxito:', getInfoResponse.data);
-      const message = JSON.stringify(getInfoResponse);
-  
-      // Publica el mensaje a MQTT y luego realiza la solicitud POST
-      client.publish('fixtures/request', message, {}, async (err) => {
+  try {
+    const getInfoResponse = await axios.get(`${appUrl}/pre-validate-bet`);
+    console.log('Información obtenida con éxito:', getInfoResponse.data);
+
+    if (getInfoResponse.data.length === 0) {
+      console.log('No hay datos para procesar.');
+    } else {
+      // Asumiendo que siempre quieras enviar el primer objeto del arreglo
+      const firstItem = getInfoResponse.data[0]; // Selecciona el primer objeto
+      const messageString = JSON.stringify(firstItem); // Convierte ese objeto a String
+      client.publish('fixtures/requests', messageString, { qos: 1 }, (err) => {
         if (err) {
           console.error('Error publishing message:', err);
         } else {
-          console.log('Message published to fixtures/request');
-          try {
-            // Realiza la solicitud POST con los detalles de la apuesta
-            const postResponse = await axios.post(`${process.env.APP_URL}/fixtures/request`, betDetails);
-            console.log('Bet placed successfully:', postResponse.data);
-          } catch (postError) {
-            console.error('Error placing bet:', postError);
-          }
+          console.log('Message published to fixtures/requests');
         }
       });
-      setTimeout(fetchAndPublish, 100000);
-    } catch (getError) {
-      console.error('Error obteniendo información:', getError);
-      setTimeout(fetchAndPublish, 100000);
     }
-  
+  } catch (error) {
+    console.error('Error obteniendo información:', error);
+  } finally {
+    // Re-programa la ejecución independientemente del resultado
+    setTimeout(fetchAndPublish, 120000); // 2 minutos
+  }
 }
 
-
-fetchAndPublish() 
+// Inicia el ciclo de obtención y publicación
+fetchAndPublish();

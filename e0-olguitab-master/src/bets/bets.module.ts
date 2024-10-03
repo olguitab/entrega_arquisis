@@ -8,7 +8,6 @@ import { PreValidateBetModule } from './pre-validate-bet/pre-validate-bet.module
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
-    PreValidateBetModule,
   ],
   providers: [BetService],
   controllers: [BetController],

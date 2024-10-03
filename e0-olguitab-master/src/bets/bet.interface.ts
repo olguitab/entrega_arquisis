@@ -1,5 +1,6 @@
 // bet.interface.ts o en la parte superior de tu archivo de servicio
 interface Bet {
+  id_usuario: string;
     id?: string; // Opcional porque MongoDB lo añade automáticamente
     request_id: string;
     group_id: string;

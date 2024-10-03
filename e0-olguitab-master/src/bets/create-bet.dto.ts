@@ -1,5 +1,6 @@
 // create-bet.dto.ts
 export class CreateBetDto {
+    readonly id_usuario: string;
     readonly request_id: string;
     readonly group_id: string;
     readonly fixture_id: number;
