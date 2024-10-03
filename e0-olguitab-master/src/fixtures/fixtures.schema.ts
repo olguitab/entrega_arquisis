@@ -1,8 +1,9 @@
 import { Schema, Document } from 'mongoose';
 
 export const FixtureSchema = new Schema({
+  bono_disponible: { type: Number, default: 40 },
   fixture: {
-    id: { type: Number, unique: true, required: true },
+    id: Number,
     referee: String,
     timezone: String,
     date: { type: Date, required: true },
@@ -55,6 +56,7 @@ export const FixtureSchema = new Schema({
 });
 
 export interface Fixture extends Document {
+  bono_disponible: number;
   fixture: {
     id: number;
     referee: string;
