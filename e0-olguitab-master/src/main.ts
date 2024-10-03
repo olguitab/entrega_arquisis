@@ -13,6 +13,8 @@ async function bootstrap() {
     credentials: true, // Permitir envío de credenciales (cookies, headers de autenticación)
   });
 
+  app.enableCors();
+
   // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle("Football Bets G23")
