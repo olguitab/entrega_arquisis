@@ -80,12 +80,13 @@ client.on('message', async (topic, message) => {
       console.error('Error processing MQTT message:', error);
     }} else if (topic === 'fixtures/requests') {
     try {
-      const parsedMessage = JSON.parse(message.toString())
-      console.log('String JSON:', JSON.parse(message.toString()));
+      const parsedMessage = message.toString();
+      console.log('String JSON:', message.toString());
       console.log('Received message on fixtures/request, sending to app...');
       //console.log('string json:', message.toString());
 
-      await axios.post(`${process.env.APP_URL}/requests`, parsedMessage);
+      await axios.post(`${process.env.APP_URL}/requests`,parsedMessage
+      );
     } catch (error) {
       console.error('Error processing MQTT message: REQUESTS', error);
     }
