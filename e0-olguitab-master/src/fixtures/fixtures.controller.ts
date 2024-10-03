@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Patch, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 import { BetService } from 'bets/bets.service';
 
@@ -37,35 +37,48 @@ export class FixturesController {
   }
 
   @Post('requests')
-async processRequest(@Body() requestBody: any[]): Promise<any> {
-  if (!Array.isArray(requestBody)) {
-    throw new BadRequestException('Invalid data format, expected an array');
-  }
-
-  const fixtureCounts: { [key: number]: number } = requestBody.reduce((acc, item) => {
-    if (typeof item.fixture_id === 'number') {
-      acc[item.fixture_id] = (acc[item.fixture_id] || 0) + 1;
+  async processRequest(@Body() requestBody: any[]): Promise<any> {
+    if (!Array.isArray(requestBody)) {
+      throw new BadRequestException('Invalid data format, expected an array');
     }
-    return acc;
-  }, {});
 
-  for (const [fixtureId, count] of Object.entries(fixtureCounts)) {
-    try {
-      const numericFixtureId = Number(fixtureId);
-      const numericCount = Number(count); // Asegúrate de que 'count' se trate como un número.
-      const fixture = await this.fixtureService.findFixtureById(numericFixtureId);
-      if (fixture) {
-        await this.fixtureService.updateFixture(numericFixtureId, fixture.bono_disponible + numericCount);
+    const fixtureCounts: { [key: number]: number } = requestBody.reduce((acc, item) => {
+      if (typeof item.fixture_id === 'number') {
+        acc[item.fixture_id] = (acc[item.fixture_id] || 0) + 1;
       }
-    } catch (error) {
-      console.error('Error updating fixture:', error);
+      return acc;
+    }, {});
+
+    for (const [fixtureId, count] of Object.entries(fixtureCounts)) {
+      try {
+        const numericFixtureId = Number(fixtureId);
+        const numericCount = Number(count); // Asegúrate de que 'count' se trate como un número.
+        const fixture = await this.fixtureService.findFixtureById(numericFixtureId);
+        if (fixture) {
+          await this.fixtureService.updateFixture(numericFixtureId, fixture.bono_disponible + numericCount);
+        }
+      } catch (error) {
+        console.error('Error updating fixture:', error);
+      }
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Fixtures processed successfully',
+    };
+  }
+
+  private validateMessage(message: any): { isValid: boolean; error?: any } {
+    if (!message || !Array.isArray(message.fixtures)) {
+      console.log('Invalid data format:', message);
+      return {
+        isValid: false,
+        error: {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Invalid data format',
+        },
+      };
     }
   }
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Fixtures processed successfully',
-  };
-}
   
   @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
