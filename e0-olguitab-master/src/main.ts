@@ -7,7 +7,7 @@ async function bootstrap() {
 
   // Configuración detallada de CORS
   app.enableCors({
-    origin: 'https://web.e0arquivaldes.me', // Permitir solo este dominio específico
+    origin: '*', // Permitir solo este dominio específico
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     credentials: true, // Permitir envío de credenciales (cookies, headers de autenticación)
