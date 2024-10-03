@@ -6,6 +6,8 @@ const client = mqtt.connect(process.env.MQTT_BROKER_URL, {
   password: process.env.MQTT_PASSWORD,
 });
 
+let readyToProcessRequests = false;
+
 client.on('connect', () => {
   console.log('Connected to MQTT Broker');
   // Suscribirse a ambos topics necesarios
@@ -31,11 +33,28 @@ client.on('connect', () => {
 
     }
   });
+  client.subscribe('fixtures/requests', (err) => {
+    if (err) {
+      console.error('Subscription error (fixtures/requests):', err);
+    } else {
+      console.log('Subscribed to topic: fixtures/requests');
+        // Activa la bandera después de un breve retraso para evitar procesar mensajes inmediatamente después de suscribirse
+      setTimeout(() => {
+        readyToProcessRequests = true;
+      }, 10000); // Espera 10 segundos antes de empezar a procesar mensajes
+
+    }
+  });
 });
 
 
 // Mensajes
 client.on('message', async (topic, message) => {
+  // Ignora los mensajes si el sistema no está listo para procesar solicitudes
+  if (!readyToProcessRequests && topic === 'fixtures/requests') {
+    console.log('Skipping message as system is not ready to process requests.');
+    return;
+  }
   if (topic === 'fixtures/validation') {
     try {
       const parsedMessage = JSON.parse(message.toString());
@@ -69,9 +88,20 @@ client.on('message', async (topic, message) => {
     } catch (error) {
       console.error('Error processing MQTT message:', error);
     }
-  } //else if (topic === 'fixtures/request') {
+  } else if (topic === 'fixtures/requests') {
+    try {
+      const parsedMessage = JSON.parse(JSON.parse(message.toString()));
+      console.log('Received message on fixtures/info, sending to app...');
+      //console.log('string json:', message.toString());
 
-  //}
+      await axios.post(`${process.env.APP_URL}/fixtures/requests`, {
+        topic,
+        message: parsedMessage,
+      });
+    } catch (error) {
+      console.error('Error processing MQTT message:', error);
+    }
+  }
   
   
   

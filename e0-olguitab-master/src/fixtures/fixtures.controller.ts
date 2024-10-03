@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException, Patch } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 import { BetService } from 'bets/bets.service';
 
@@ -8,22 +8,22 @@ export class FixturesController {
     private readonly betService: BetService
   ) {};
 
-
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      const { message } = requestBody;
-      //('Received request body process fixtures:', message.fixtures);
-      
-      if (!message || !Array.isArray(message.fixtures)) {
-        console.log('Invalid data format in processFixtures:', requestBody);
-        return {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Invalid data format',
-        };
+      console.log('Received request body:', requestBody);
+      const { message } = requestBody.message;
+
+      if (!message || !Array.isArray(requestBody)) {
+        console.log('Invalid data format:', message.fixtures);
+        throw new BadRequestException('Invalid data format');
       }
-      const savedFixtures = await this.processFixturesData(message.fixtures);
-      
+
+      const fixtures = message.fixtures;
+      console.log('Processing fixtures:', fixtures);
+
+      const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
+      console.log('Saved fixtures:', savedFixtures);
 
       return {
         statusCode: HttpStatus.CREATED,
@@ -32,38 +32,41 @@ export class FixturesController {
       };
     } catch (error) {
       console.error('Error processing fixtures:', error);
-      return {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Internal Server Error',
-      };
+      throw new BadRequestException('Internal Server Error');
     }
   }
+
+  @Post('requests')
+async processRequest(@Body() requestBody: any[]): Promise<any> {
+  if (!Array.isArray(requestBody)) {
+    throw new BadRequestException('Invalid data format, expected an array');
+  }
+
+  const fixtureCounts: { [key: number]: number } = requestBody.reduce((acc, item) => {
+    if (typeof item.fixture_id === 'number') {
+      acc[item.fixture_id] = (acc[item.fixture_id] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  for (const [fixtureId, count] of Object.entries(fixtureCounts)) {
+    try {
+      const numericFixtureId = Number(fixtureId);
+      const numericCount = Number(count); // Asegúrate de que 'count' se trate como un número.
+      const fixture = await this.fixtureService.findFixtureById(numericFixtureId);
+      if (fixture) {
+        await this.fixtureService.updateFixture(numericFixtureId, fixture.bono_disponible + numericCount);
+      }
+    } catch (error) {
+      console.error('Error updating fixture:', error);
+    }
+  }
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'Fixtures processed successfully',
+  };
+}
   
-  private validateMessage(message: any): { isValid: boolean; error?: any } {
-    if (!message || !Array.isArray(message.fixtures)) {
-      console.log('Invalid data format:', message);
-      return {
-        isValid: false,
-        error: {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Invalid data format',
-        },
-      };
-    }
-
-    return { isValid: true };
-  }
-
-
-  private async processFixturesData(fixtures: any[]): Promise<any> {
-    //console.log('Processing fixtures:', fixtures);
-
-    const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-    //console.log('Saved fixtures:', savedFixtures);
-
-    return savedFixtures;
-  }
-
   @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
@@ -78,16 +81,6 @@ export class FixturesController {
 
       await this.fixtureService.processHistoryFixtures(message.fixtures);
 
-
-      // crear un array con los ids de updated fixtures para pasárselo a la función de buscar bets de esos fixtures
-
-  
-      //console.log('Additional processing for history...');
-      // acá filtrar los ids y buscar bonos comprados de esos partidos, mandar los savedFixtures
-      // allá procesar según ids de partidos y actualizar bonos que estén con estado pendiente
-  
-      // Agregar lógica adicional aquí...
-
       return ;
     } catch (error) {
       console.error('Error processing fixture history:', error);
@@ -97,8 +90,7 @@ export class FixturesController {
       };
     }
   }
-
-
+  
 
   @Get(':id')
   async getFixtureById(@Param('id') id: string): Promise<any> {
@@ -108,6 +100,9 @@ export class FixturesController {
         throw new BadRequestException('Invalid ID format');
       }
       const fixture = await this.fixtureService.getFixtureById(numericId);
+      if (!fixture) {
+        throw new BadRequestException('Fixture not found');
+      }
       return {
         statusCode: HttpStatus.OK,
         data: fixture,
@@ -148,7 +143,7 @@ export class FixturesController {
         if (isNaN(dateObj.getTime())) {
           throw new BadRequestException('Invalid date format');
         }
-        filters['fixture.date'] = { $gte: dateObj }; // Use Date object directly
+        filters['fixture.date'] = { $gte: dateObj };
       }
 
       const fixtures = await this.fixtureService.getAllFixtures(pageNumber, countNumber, filters);
@@ -162,4 +157,3 @@ export class FixturesController {
     }
   }
 }
-
