@@ -2,7 +2,8 @@ import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { ValidateBetService } from './validate-bet.service';
 import { PreValidateBetService } from 'bets/pre-validate-bet/pre-validate-bet.service';
 import { BetService } from 'bets/bets.service';
-import { WalletService } from 'wallet/wallet.service'; // Asegúrate de tener la ruta correcta
+import { WalletService } from 'wallet/wallet.service'; 
+import axios from 'axios';// Asegúrate de tener la ruta correcta
 // Asegúrate de tener la interfaz correcta importada si la estás usando
 // import { ValidateBet } from './validate-bet.interface';
 
@@ -49,6 +50,26 @@ async processFixtures(@Body() requestBody: any): Promise<any> {
       const preValidateBetRecord = await this.preValidateBetService.findByIdRequest(message.request_id);
       if (preValidateBetRecord) {
         console.log('Found matching PreValidateBet record, id_usuario:', preValidateBetRecord.id_usuario.toString());
+
+        const betData = {
+          id_usuario: preValidateBetRecord.id_usuario.toString(),
+          request_id: message.request_id,
+          // Añade aquí el resto de campos necesarios para crear la Bet
+          group_id: message.group_id.toString(),
+          fixture_id: preValidateBetRecord.fixture_id,
+          league_name: preValidateBetRecord.league_name,
+          round: preValidateBetRecord.round,
+          date: preValidateBetRecord.date,
+          result: preValidateBetRecord.result,
+          deposit_token: preValidateBetRecord.deposit_token,
+          datetime: new Date().toISOString(),
+          quantity: preValidateBetRecord.quantity,
+          seller: message.seller,
+        };
+      
+        // Utiliza el betService para crear la nueva Bet
+        const createdBet = await this.betService.createbet(betData);
+        console.log('Bet created successfully:', createdBet);
 
         // Busca el objeto Wallet correspondiente al id_usuario
         const wallet = await this.walletService.findByUserId(preValidateBetRecord.id_usuario.toString());
