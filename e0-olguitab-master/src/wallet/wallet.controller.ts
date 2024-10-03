@@ -20,7 +20,6 @@ export class WalletController {
   @Get('all')
   async getAll(): Promise<any> {
     //console.log('entra al get all wallets');
-
     const wallets = await this.walletService.findAll();
     if (!wallets) {
       throw new Error('Wallets no encontradas');
