@@ -29,15 +29,9 @@ async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ fixture_id: fixtureId }).exec();
   }
 
-  async updateBetResult(requestId: string, result: string): Promise<void> {
-    const bet = await this.betModel.findOne({ request_id: requestId }).exec();
 
-    if (!bet) {
-      throw new NotFoundException(`Bet with request ID ${requestId} not found`);
-    }
-
-    //bet.checked_result = true;
-    await bet.save();
-
+  async updateBetStatus(requestId: string, status: string): Promise<void> {
+    await this.betModel.updateOne({ request_id: requestId }, { status }).exec();
   }
+  
 }

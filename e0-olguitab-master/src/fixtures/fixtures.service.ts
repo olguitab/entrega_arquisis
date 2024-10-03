@@ -3,11 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Fixture } from './fixtures.schema';
 import { BetService } from 'bets/bets.service';
+import { first } from 'rxjs';
+import { WalletService } from 'wallet/wallet.service';
 
 @Injectable()
 export class FixtureService {
   constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>,
-  private readonly betService: BetService) {}
+  private readonly betService: BetService,
+  private readonly walletService: WalletService) {}
 
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
     const updatedFixtures = await Promise.all(
@@ -47,6 +50,36 @@ export class FixtureService {
     }
     return fixture;
   }
+
+
+  async getOddsFromFixture(fixtureId: number): Promise<any> {
+    const fixture = await this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
+    if (!fixture) {
+      throw new NotFoundException(`Fixture with ID ${fixtureId} not found`);
+    }
+    console.log('Odds:', fixture.odds);
+    console.log('Odds values:', fixture.odds[0].values);
+    console.log('Odds values length:', fixture.odds[0].values.length);
+    //const first_value = fixture.odds[0].values[0];
+    //const second_value = fixture.odds[0].values[1]?.odd ?? null;
+    /*
+    const odds = [];
+    fixture.odds[0].values.map( (element) => {
+      console.log('Value:', element.value);
+      console.log('Odd:', element.odd);
+      odds.push(element);
+    });
+    */
+    const odds = fixture.odds[0].values.map( (element) => element);
+
+    const first_value = odds.values[0];
+    const second_value = odds.values[1].odd ;
+    const third_value = odds.values[2].odd ;
+    
+    console.log('Odds:', odds);
+    return fixture.odds;
+  }
+
   async findFixtureById(fixtureId: number): Promise<Fixture> {
     return this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
   }
@@ -70,8 +103,6 @@ export class FixtureService {
   }
   
   async processHistoryFixtures(fixturesData: any[]): Promise<any[]> {
-    // esta función va a actualizar las fixtures existentes cambiando sus datoss
-    //console.log('Fixtures a actualizar:', fixturesData);
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
         const fixtureId = fixtureData.fixture.id;
@@ -83,67 +114,77 @@ export class FixtureService {
         ).exec();
       })
     );
-    //console.log('Fixtures actualizadas:', updatedFixtures.length);
     const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
+    this.UpdateBetsFromHistory(fixtureIds);
+    
+    return updatedFixtures; 
+  }
 
-
-    /*
-
+  async UpdateBetsFromHistory(fixtureIds: number[]): Promise<void> {
     for (const fixtureId of fixtureIds) {
       const fixture = await this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
-      const homeTeam = fixture.teams.home.name;
-      const awayTeam = fixture.teams.away.name;
+      if (fixture.fixture.status.long === 'Match Finished'){
+        // solo analizar los terminados
+        const homeTeam = fixture.teams.home.name;
+        const awayTeam = fixture.teams.away.name;
 
-      const homeGoals = fixture.goals.home;
-      const awayGoals = fixture.goals.away;
+        const homeGoals = fixture.goals.home;
+        const awayGoals = fixture.goals.away;
 
-      // ver casos que vienen nulos
-      let winner;
-      let odd;
-      if (homeGoals === null || awayGoals === null|| fixture.odds[0].values[0].odd === null || fixture.odds.values.length === 0) 
-      {
-        continue;
-      }
-      if (homeGoals > awayGoals) {
-        winner = homeTeam;
-        odd = fixture.odds[0].values[0].odd;
-      } else if (awayGoals > homeGoals) {
-        winner = awayTeam;
-        odd = fixture.odds[0].values[2].odd;
-      } else if (homeGoals === awayGoals) {
-        winner = '---';
-        odd = fixture.odds[0].values[1].odd;
-      }
-      else {
-        winner = null;
-      }
-
-      const bets = await this.betService.findBetsByFixtureId(fixtureId);
-
-      for (const bet of bets) {
-        if (bet.checked_result) {
+        // ver casos que vienen nulos
+        let winner;
+        let odd;
+        if (homeGoals === null || awayGoals === null|| fixture.odds[0].values[0].odd === null || fixture.odds.values.length === 0) 
+        {
           continue;
         }
+        const odds = fixture.odds[0].values.map( (element) => element);
 
+        const home_value = odds.values[0];
+        const draw_value = odds.values[1] ;
+        const away_value = odds.values[2];
+
+        if (homeGoals > awayGoals) {
+          winner = homeTeam;
+          odd = home_value.odd;
+        } else if (awayGoals > homeGoals) {
+          winner = awayTeam;
+          odd = away_value.odd;
+        } else if (homeGoals === awayGoals) {
+          winner = '---';
+          odd = draw_value.odd;
+        }
         else {
-          await this.betService.updateBetResult(bet.request_id, winner);
+          winner = null;
+          continue;
+        }
+        const bets = await this.betService.findBetsByFixtureId(fixtureId);
 
-          if (bet.result === winner) {
-            // actualiza el bono
-            //console.log('Bono ganado:', bet);
-            const money = bet.quantity * 1000 * odd;
+        for (const bet of bets) {
+          if (bet.status !== 'pending') {
+            continue;
           }
+
           else {
-            //console.log('Bono perdido:', bet);
+            if (bet.result === winner) {
+              // actualiza el bono
+              //console.log('Bono ganado:', bet);
+              bet.status = 'won';
+              const money = bet.quantity * 1000 * odd;
+              await this.walletService.addMoneyToWallet(bet.id_usuario, money);
+            }
+            else {
+              bet.status = 'lost';
+            }
+
+            await this.betService.updateBetStatus(bet.request_id, bet.status); 
           }
         }
       }
 
     }
-    */
-    
-    return updatedFixtures; 
   }
+
 
 
 }

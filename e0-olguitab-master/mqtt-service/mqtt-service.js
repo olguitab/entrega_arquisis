@@ -92,11 +92,13 @@ client.on('message', async (topic, message) => {
       console.error('Error processing MQTT message: REQUESTS', error);
     }
   }
+    */
 
   else if (topic === 'fixtures/history') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message on fixtures/history, sending to app...');
+      console.log('History message:', message.toString());
 
       await axios.patch(`${process.env.APP_URL}/fixtures/history`, {
         topic,
@@ -105,7 +107,7 @@ client.on('message', async (topic, message) => {
     } catch (error) {
       console.error('Error processing MQTT message: HISTORIA', error);
     }
-  }*/
+  }
 });
 
 async function fetchAndPublish() {
