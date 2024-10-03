@@ -1,3 +1,4 @@
+
 import * as mongoose from 'mongoose';
 
 export const ValidateBetSchema = new mongoose.Schema({

@@ -1,3 +1,4 @@
+// pre-validate-bet.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,6 +9,11 @@ export class PreValidateBetService {
   constructor(
     @InjectModel('PreValidateBet') private readonly preValidateBetModel: Model<PreValidateBet>,
   ) {}
+
+  async findByIdRequest(idRequest: string): Promise<PreValidateBet> {
+    console.log('Buscando por request_id:', idRequest);
+    return await this.preValidateBetModel.findOne({ request_id: idRequest });
+  }
 
   async create(createPreValidateBetDto: PreValidateBet): Promise<PreValidateBet> {
     const createdBet = new this.preValidateBetModel(createPreValidateBetDto);

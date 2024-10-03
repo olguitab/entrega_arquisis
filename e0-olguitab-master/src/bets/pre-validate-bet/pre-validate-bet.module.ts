@@ -11,6 +11,6 @@ import { PreValidateBetSchema } from './pre-validate-bet.schema';
   ],
   controllers: [PreValidateBetController],
   providers: [PreValidateBetService],
-  exports: [PreValidateBetService, MongooseModule, PreValidateBetModule],
+  exports: [PreValidateBetService, MongooseModule],
 })
 export class PreValidateBetModule {}
