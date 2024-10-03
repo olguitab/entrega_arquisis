@@ -1,9 +1,12 @@
 import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException, Patch } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
+import { BetService } from 'bets/bets.service';
 
 @Controller('fixtures')
 export class FixturesController {
-  constructor(private readonly fixtureService: FixtureService,) {};
+  constructor(private readonly fixtureService: FixtureService,
+    private readonly betService: BetService
+  ) {};
 
 
   @Post('process')
@@ -73,13 +76,18 @@ export class FixturesController {
         return validation.error;
       }
 
-      const updatedFixtures = await this.fixtureService.processHistoryFixtures(message.fixtures);
+      await this.fixtureService.processHistoryFixtures(message.fixtures);
+
+
+      // crear un array con los ids de updated fixtures para pasárselo a la función de buscar bets de esos fixtures
+
   
       //console.log('Additional processing for history...');
       // acá filtrar los ids y buscar bonos comprados de esos partidos, mandar los savedFixtures
       // allá procesar según ids de partidos y actualizar bonos que estén con estado pendiente
   
       // Agregar lógica adicional aquí...
+
       return ;
     } catch (error) {
       console.error('Error processing fixture history:', error);

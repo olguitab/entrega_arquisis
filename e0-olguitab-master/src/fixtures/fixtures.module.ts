@@ -10,8 +10,9 @@ import { BetModule } from 'bets/bets.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
+    MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
   ],
-  providers: [FixtureService],
+  providers: [FixtureService, BetService],
   controllers: [FixturesController],
 })
 export class FixturesModule {}
