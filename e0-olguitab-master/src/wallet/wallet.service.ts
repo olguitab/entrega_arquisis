@@ -63,7 +63,18 @@ export class WalletService {
   
     console.log(`Money added to wallet: ${wallet}`);
   }
-
+  async findByUserId(userId: string): Promise<Wallet | null> {
+    return this.walletModel.findOne({ user_id: userId }).exec();
+  }
+  
+  async updateMoney(walletId: string, newMoneyValue: number): Promise<Wallet> {
+    const wallet = await this.walletModel.findById(walletId).exec();
+    if (!wallet) {
+      throw new Error('Wallet not found');
+    }
+    wallet.money = newMoneyValue; // Actualiza el valor del dinero
+    return wallet.save(); // Guarda el wallet actualizado en la base de datos
+  }
   async getWalletBalance(user_id: string): Promise<number> {
     console.log('entra a get wallet balance id:', user_id);
     

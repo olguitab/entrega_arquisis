@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Request } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FixtureSchema } from './fixtures/fixtures.schema';
 import { FixturesController } from './fixtures/fixtures.controller';
@@ -10,6 +10,7 @@ import { PreValidateBetModule } from 'bets/pre-validate-bet/pre-validate-bet.mod
 import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
 import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
 import { WalletModule } from 'wallet/wallet.module';
+import { RequestModule } from 'requests/requests.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WalletModule } from 'wallet/wallet.module';
     PreValidateBetModule,
     ValidateBetModule,
     WalletModule,
+    RequestModule,
   ],
   controllers: [FixturesController],
   providers: [FixtureService, InitializationService],

@@ -1,19 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './user.schema'; // Verifica que la ruta sea correcta
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './create-user.dto';
+import { WalletService } from 'wallet/wallet.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private walletService: WalletService,
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const createdUser = new this.userModel({ ...createUserDto, password: hashedPassword });
     // Guardar el usuario en la base de datos
     await createdUser.save();
+    // función crear wallet
+    await this.walletService.createWallet(createdUser._id as Types.ObjectId);
     return createdUser.toObject(); // Asegúrate de devolver el objeto después de guardarlo
   }
 

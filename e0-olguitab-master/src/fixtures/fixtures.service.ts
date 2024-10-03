@@ -57,4 +57,25 @@ export class FixtureService {
     }
     return fixture;
   }
+  async findFixtureById(fixtureId: number): Promise<Fixture> {
+    return this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
+  }
+
+  async updateFixture(fixtureId: number, additionalCount: number): Promise<Fixture> {
+    // Encuentra el documento por ID
+    const fixture = await this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
+  
+    if (fixture) {
+      // Realiza la suma utilizando el valor actual de bono_disponible
+      fixture.bono_disponible += additionalCount;
+  
+      // Guarda el documento actualizado
+      await fixture.save();
+  
+      return fixture;
+    } else {
+      // Maneja el caso en que el documento no se encuentra
+      throw new Error('Fixture not found');
+    }
+  }
 }

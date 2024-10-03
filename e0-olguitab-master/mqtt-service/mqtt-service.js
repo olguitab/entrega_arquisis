@@ -1,11 +1,13 @@
 const mqtt = require('mqtt');
 const axios = require('axios');
 
-// Asegúrate de tener definidas estas variables de entorno o reemplázalas con valores directos para pruebas.
 const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
 const mqttUsername = process.env.MQTT_USERNAME;
 const mqttPassword = process.env.MQTT_PASSWORD;
 const appUrl = process.env.APP_URL;
+
+// Bandera para controlar el estado de procesamiento de mensajes
+let readyToProcessRequests = false;
 
 const client = mqtt.connect(mqttBrokerUrl, {
   username: mqttUsername,
@@ -14,16 +16,26 @@ const client = mqtt.connect(mqttBrokerUrl, {
 
 client.on('connect', () => {
   console.log('Connected to MQTT Broker');
-  client.subscribe(['fixtures/info', 'fixtures/validation', 'fixtures/request'], (err) => {
+  client.subscribe(['fixtures/info', 'fixtures/validation', 'fixtures/requests'], (err) => {
     if (err) {
       console.error('Subscription error:', err);
     } else {
       console.log('Subscribed to topics: fixtures/info, fixtures/request and fixtures/validation');
+      // Activa la bandera después de un breve retraso para evitar procesar mensajes inmediatamente después de suscribirse
+      setTimeout(() => {
+        readyToProcessRequests = true;
+      }, 10000); // Espera 10 segundos antes de empezar a procesar mensajes
     }
   });
 });
 
 client.on('message', async (topic, message) => {
+  // Ignora los mensajes si el sistema no está listo para procesar solicitudes
+  if (!readyToProcessRequests && topic === 'fixtures/requests') {
+    console.log('Skipping message as system is not ready to process requests.');
+    return;
+  }
+
   try {
     const parsedMessage = JSON.parse(message.toString());
     console.log(`Received message on topic ${topic}`);
@@ -36,9 +48,9 @@ client.on('message', async (topic, message) => {
       case 'fixtures/info':
         endpoint = '/fixtures/process';
         break;
-      /*case 'fixtures/requests':
-        endpoint = '/fixtures/request';
-        break;*/
+      case 'fixtures/requests':
+        endpoint = '/requests';
+        break;
       default:
         console.log(`No handler for topic ${topic}`);
         return;
@@ -54,32 +66,9 @@ client.on('message', async (topic, message) => {
   }
 });
 
-async function fetchAndPublish() {
-  try {
-    const getInfoResponse = await axios.get(`${appUrl}/pre-validate-bet`);
-    console.log('Información obtenida con éxito:', getInfoResponse.data);
-
-    if (getInfoResponse.data.length === 0) {
-      console.log('No hay datos para procesar.');
-    } else {
-      // Asumiendo que siempre quieras enviar el primer objeto del arreglo
-      const firstItem = getInfoResponse.data[0]; // Selecciona el primer objeto
-      const messageString = JSON.stringify(firstItem); // Convierte ese objeto a String
-      client.publish('fixtures/requests', messageString, { qos: 1 }, (err) => {
-        if (err) {
-          console.error('Error publishing message:', err);
-        } else {
-          console.log('Message published to fixtures/requests');
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error obteniendo información:', error);
-  } finally {
-    // Re-programa la ejecución independientemente del resultado
-    setTimeout(fetchAndPublish, 120000); // 2 minutos
-  }
-}
-
 // Inicia el ciclo de obtención y publicación
 fetchAndPublish();
+
+async function fetchAndPublish() {
+  // Tu lógica existente aquí
+}
