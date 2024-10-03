@@ -12,13 +12,14 @@ export class FixturesController {
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
       console.log('Received request body:', requestBody);
-      const { message } = requestBody.message;
-
-      if (!message || !Array.isArray(requestBody)) {
-        console.log('Invalid data format:', message.fixtures);
-        throw new BadRequestException('Invalid data format');
+      const { message } = requestBody;
+      if (!message || !Array.isArray(message.fixtures)) {
+        console.log('Invalid data format:', requestBody);
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Invalid data format',
+        };
       }
-
       const fixtures = message.fixtures;
       console.log('Processing fixtures:', fixtures);
 
