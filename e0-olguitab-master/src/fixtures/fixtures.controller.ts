@@ -1,9 +1,12 @@
 import { Controller, Post, Body, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
+import { BetService } from 'bets/bets.service';
 
 @Controller('fixtures')
 export class FixturesController {
-  constructor(private readonly fixtureService: FixtureService) {}
+  constructor(private readonly fixtureService: FixtureService,
+    private readonly betService: BetService
+  ) {};
 
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
@@ -63,6 +66,31 @@ async processRequest(@Body() requestBody: any[]): Promise<any> {
     message: 'Fixtures processed successfully',
   };
 }
+  
+  @Patch('history')
+  async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
+    try {
+      //console.log('Enter patch for history');
+      const { message } = requestBody;
+  
+      // Usar la función de validación
+      const validation = this.validateMessage(message);
+      if (!validation.isValid) {
+        return validation.error;
+      }
+
+      await this.fixtureService.processHistoryFixtures(message.fixtures);
+
+      return ;
+    } catch (error) {
+      console.error('Error processing fixture history:', error);
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal Server Error',
+      };
+    }
+  }
+  
 
   @Get(':id')
   async getFixtureById(@Param('id') id: string): Promise<any> {
