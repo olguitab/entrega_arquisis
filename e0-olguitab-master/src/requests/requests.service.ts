@@ -8,8 +8,8 @@ import { Request } from './requests.schema';
 export class RequestsService {
   constructor(@InjectModel('Request') private readonly requestModel: Model<Request>) {}
 
-  async create(data: any): Promise<Request> {
-    const existingRequest = await this.requestModel.findOne({ uniqueId: data.uniqueId }).exec();
+  async createOrUpdateFixtures(data: any): Promise<Request> {
+    const existingRequest = await this.requestModel.findOne({ request_id: data.request_id }).exec();
     if (existingRequest) {
       throw new Error('Request already exists');
     }
