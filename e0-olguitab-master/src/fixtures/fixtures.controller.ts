@@ -1,6 +1,7 @@
 import { Controller, Post, Body, Patch, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 import { BetService } from 'bets/bets.service';
+import { get } from 'axios';
 
 @Controller('fixtures')
 export class FixturesController {
@@ -167,6 +168,24 @@ export class FixturesController {
       };
     } catch (error) {
       console.error('Error al obtener fixtures:', error);
+      throw error;
+    }
+  }
+
+  @Get('odds/:id')
+  async getOddsFromFixture(@Param('id') id: string): Promise<any> {
+    try {
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) {
+        throw new BadRequestException('Invalid ID format');
+      }
+      const odds = await this.fixtureService.getOddsFromFixture(numericId);
+      return {
+        statusCode: HttpStatus.OK,
+        data: odds,
+      };
+    } catch (error) {
+      console.error('Error al obtener las cuotas del fixture:', error);
       throw error;
     }
   }

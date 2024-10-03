@@ -16,6 +16,8 @@ interface Bet {
     ipAddress?: string; // Dirección IP del usuario
     country?: string;  // País obtenido de la IP
     city?: string;
+    //checked_result?: boolean; // Si el bet ha sido verificado, true si se revisa y se realizan pagos
+    status?: string; // estado del bet: 'pending', 'won', 'lost'
   }
 
   export default Bet;
