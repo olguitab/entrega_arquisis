@@ -8,19 +8,12 @@ import { Request } from './requests.schema';
 export class RequestsService {
   constructor(@InjectModel('Request') private readonly requestModel: Model<Request>) {}
 
-  async createOrUpdateFixtures(fixtureData: any): Promise<any> {
-    // Primero, intenta encontrar un documento con el request_id dado.
-    const existingRequest = await this.requestModel.findOne({ 'request_id': fixtureData.request_id });
-
-    if (!existingRequest) {
-      // Si no existe, crea un nuevo documento.
-      const newRequest = new this.requestModel(fixtureData);
-      return await newRequest.save();
-    } else {
-      // Si ya existe, puedes decidir no actualizarlo y simplemente retornar el existente,
-      // o manejar la situación de alguna otra manera que consideres apropiada.
-      // En este caso, simplemente retornamos el documento existente sin hacer cambios.
-      return existingRequest;
+  async createOrUpdateFixtures(data: any): Promise<Request> {
+    const existingRequest = await this.requestModel.findOne({ request_id: data.request_id }).exec();
+    if (existingRequest) {
+      throw new Error('Request already exists');
     }
+    const createdRequest = new this.requestModel(data);
+    return createdRequest.save();
   }
 }
