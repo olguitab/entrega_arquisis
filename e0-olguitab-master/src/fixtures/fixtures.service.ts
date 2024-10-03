@@ -87,7 +87,7 @@ export class FixtureService {
     const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
 
 
-    
+    /*
 
     for (const fixtureId of fixtureIds) {
       const fixture = await this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
@@ -140,6 +140,7 @@ export class FixtureService {
       }
 
     }
+    */
     
     return updatedFixtures; 
   }
