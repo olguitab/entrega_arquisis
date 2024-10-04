@@ -69,18 +69,18 @@ export class FixturesController {
     };
   }
 
-  private validateMessage(message: any): { isValid: boolean; error?: any } {
-    if (!message || !Array.isArray(message.fixtures)) {
-      console.log('Invalid data format:', message);
-      return {
-        isValid: false,
-        error: {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Invalid data format',
-        },
-      };
-    }
-  }
+  // private validateMessage(message: any): { isValid: boolean; error?: any } {
+  //   if (!message || !Array.isArray(message.fixtures)) {
+  //     console.log('Invalid data format:', message);
+  //     return {
+  //       isValid: false,
+  //       error: {
+  //         statusCode: HttpStatus.BAD_REQUEST,
+  //         message: 'Invalid data format',
+  //       },
+  //     };
+  //   }
+  // }
   
   @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
@@ -89,10 +89,14 @@ export class FixturesController {
       const { message } = requestBody;
   
       // Usar la función de validación
-      const validation = this.validateMessage(message);
-      if (!validation.isValid) {
-        return validation.error;
-      }
+      if (!message || !Array.isArray(message.fixtures)) {
+        return {
+          error: {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: 'Invalid data format',
+          },
+        }
+        }
 
       await this.fixtureService.processHistoryFixtures(message.fixtures);
 

@@ -8,6 +8,8 @@ import { BetSchema } from 'bets/bet.schema';
 import { BetModule } from 'bets/bets.module';
 import { WalletModule } from 'wallet/wallet.module';
 import { WalletService } from 'wallet/wallet.service';
+import { UsersModule } from 'user/user.module';
+import { UsersService } from 'user/user.service';
 
 @Module({
   imports: [
@@ -15,8 +17,9 @@ import { WalletService } from 'wallet/wallet.service';
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
     BetModule,
     WalletModule,
+    UsersModule
   ],
-  providers: [FixtureService, BetService, WalletService],
+  providers: [FixtureService, BetService, UsersService],
   controllers: [FixturesController],
 })
 export class FixturesModule {}
