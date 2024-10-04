@@ -23,4 +23,9 @@ export class RequestsService {
       return existingRequest;
     }
   }
+
+  async calculateTotalRequestsByFixtureId(fixture_id: number): Promise<number> {
+    console.log('fixture_id:', fixture_id);
+    return await this.requestModel.countDocuments({ 'fixture_id': fixture_id });
+  }
 }

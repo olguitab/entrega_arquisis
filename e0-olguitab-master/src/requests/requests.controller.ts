@@ -1,5 +1,5 @@
 // src/requests/requests.controller.ts
-import { Body, Controller, Post, HttpStatus, HttpException } from '@nestjs/common';
+import { Body, Controller, Post, HttpStatus, HttpException, Get, Param } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 
 @Controller('requests')
@@ -31,4 +31,12 @@ export class RequestsController {
       throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Get('total-bonus-avaliable/:fixture_id')
+  async getTotalBonusAvaliable(@Param('fixture_id') fixture_id: number): Promise<number> {
+    const totalRequest = await this.requestsService.calculateTotalRequestsByFixtureId(fixture_id);
+    const totalBonusAvailable = 40 - totalRequest;
+    return totalBonusAvailable;
+  }
+  
 };
