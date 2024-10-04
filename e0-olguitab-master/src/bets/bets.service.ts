@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBetDto } from './create-bet.dto';
 import Bet from './bet.interface'; // Asegúrate de que la ruta de importación sea correcta
-import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class BetService {
@@ -24,14 +23,4 @@ async findBetsByUserId(userId: string): Promise<Bet[]> {
     await createdBet.save();
     return createdBet.toObject();
   }
-
-  async findBetsByFixtureId(fixtureId: number): Promise<Bet[]> {
-    return this.betModel.find({ fixture_id: fixtureId }).exec();
-  }
-
-
-  async updateBetStatus(requestId: string, status: string): Promise<void> {
-    await this.betModel.updateOne({ request_id: requestId }, { status }).exec();
-  }
-  
 }
