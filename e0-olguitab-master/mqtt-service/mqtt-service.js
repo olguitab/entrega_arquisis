@@ -83,7 +83,7 @@ client.on('message', async (topic, message) => {
       const parsedMessage = JSON.parse(message.toString())
       console.log('String JSON:', JSON.parse(message.toString()));
       console.log('Received message on fixtures/request, sending to app...');
-      //console.log('string json:', message.toString());
+      console.log('string json:', message.toString());
 
       await axios.post(`${process.env.APP_URL}/requests`, parsedMessage);
     } catch (error) {

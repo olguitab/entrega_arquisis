@@ -116,7 +116,7 @@ export class FixtureService {
       })
     );
     const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
-    this.UpdateBetsFromHistory(fixtureIds);
+    //this.UpdateBetsFromHistory(fixtureIds);
     
     return updatedFixtures; 
   }
