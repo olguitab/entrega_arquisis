@@ -16,6 +16,4 @@ export const BetSchema = new mongoose.Schema({
   ipAddress: String, // Dirección IP del usuario
   country: String, // País obtenido de la IP
   city: String,
-  //checked_result: { type: Boolean, default: false }, // Si el bet ha sido verificado, true si se revisa y se realizan pagos
-  status: { type: String, default: 'pending' }, // Estado del bet, por ejemplo, 'pending', 'won', 'lost'
 });
