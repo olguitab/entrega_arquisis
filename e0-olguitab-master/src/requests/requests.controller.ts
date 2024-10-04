@@ -10,18 +10,15 @@ export class RequestsController {
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
       console.log('Received request body:', requestBody);
-  
-      // Ahora, requestBody es directamente el objeto que quieres procesar
-      // No necesitas extraerlo de una propiedad `message`
-      if (!requestBody || typeof requestBody !== 'object') {
-        console.log('Invalid data format:', requestBody);
+      const { message } = requestBody;
+      if (!message || !Array.isArray( message)) {
+        console.log('Invalid data format:', message);
         return {
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Invalid data format',
         };
       }
-  
-      const fixtures = requestBody; // requestBody ya es el objeto que quieres
+      const fixtures = message
       console.log('Processing fixtures:', fixtures);
 
       const savedFixtures = await this.requestsService.createOrUpdateFixtures(fixtures);
@@ -38,5 +35,4 @@ export class RequestsController {
     const totalBonusAvailable = 40 - totalRequest;
     return totalBonusAvailable;
   }
-  
 };
