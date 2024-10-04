@@ -90,9 +90,9 @@ client.on('message', async (topic, message) => {
       console.error('Error processing MQTT message: REQUESTS', error);
     }
   }
-    */
+  
 
-  /*else if (topic === 'fixtures/history') {
+  else if (topic === 'fixtures/history') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message on fixtures/history, sending to app...');

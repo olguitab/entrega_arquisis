@@ -17,7 +17,7 @@ import { WalletModule } from 'wallet/wallet.module';
     WalletModule,
   ],
   controllers: [ValidateBetController],
-  providers: [ValidateBetService],
+  providers: [ValidateBetService, PreValidateBetService],
   exports: [ValidateBetModule],
 })
 export class ValidateBetModule {}
