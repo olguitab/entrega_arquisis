@@ -104,6 +104,8 @@ export class FixtureService {
   }
   
   async processHistoryFixtures(fixturesData: any[]): Promise<any[]> {
+    // esta función va a actualizar las fixtures existentes cambiando sus datoss
+    //console.log('Fixtures a actualizar:', fixturesData);
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
         const fixtureId = fixtureData.fixture.id;
@@ -115,9 +117,8 @@ export class FixtureService {
         ).exec();
       })
     );
-    const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
-    //this.UpdateBetsFromHistory(fixtureIds);
-    
+    //console.log('Fixtures actualizadas:', updatedFixtures.length);
+  
     return updatedFixtures; 
   }
 
