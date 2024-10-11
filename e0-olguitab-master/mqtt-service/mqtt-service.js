@@ -50,6 +50,7 @@ client.on('message', async (topic, message) => {
     try {
       const parsedMessage = JSON.parse(message.toString());
       console.log('Recibiendo validación...');
+      consoñe.log('Validation message:\n', message.toString());
       const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
 
       // Verificar si la respuesta está vacía. Ajusta esta condición según lo que esperes como respuesta vacía.
@@ -83,7 +84,7 @@ client.on('message', async (topic, message) => {
       const parsedMessage = JSON.parse(message.toString())
       console.log('String JSON:', JSON.parse(message.toString()));
       console.log('Received message on fixtures/request, sending to app...');
-      //console.log('string json:', message.toString());
+      console.log('Request listen message: \n', message.toString());
 
       await axios.post(`${process.env.APP_URL}/requests`, parsedMessage);
     } catch (error) {
@@ -95,6 +96,7 @@ client.on('message', async (topic, message) => {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message on fixtures/history, sending to app...');
+      console.log('History message:\n', message.toString());
 
       await axios.patch(`${process.env.APP_URL}/fixtures/history`, {
         topic,
@@ -139,4 +141,4 @@ async function fetchAndPublish() {
   }
 }
 
-fetchAndPublish();
+//fetchAndPublish();

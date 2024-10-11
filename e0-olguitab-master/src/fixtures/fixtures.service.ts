@@ -71,9 +71,21 @@ export class FixtureService {
   
   async processHistoryFixtures(fixturesData: any[]): Promise<any[]> {
     // esta función va a actualizar las fixtures existentes cambiando sus datoss
-    //console.log('Fixtures a actualizar:', fixturesData);
+    console.log('Fixtures a actualizar:', fixturesData);
+    if (!fixturesData) {
+      throw new Error('fixtureData is null or undefined');
+    
+    }
+
+    if (!Array.isArray(fixturesData)) {
+      throw new Error('fixturesData is not an array');
+  }
+
+    console.log('Primer elemento:', fixturesData[0]);
+    console.log('Fixture', fixturesData[0].fixture);
     const updatedFixtures = await Promise.all(
-      fixturesData.map(async (fixtureData) => {
+        fixturesData.map(async (fixtureData) => {
+          
         const fixtureId = fixtureData.fixture.id;
   
         return await this.fixtureModel.findOneAndUpdate(
@@ -84,9 +96,11 @@ export class FixtureService {
       })
     );
     //console.log('Fixtures actualizadas:', updatedFixtures.length);
-    const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
 
+    // hay que cambiar este fixture que es el que no existe xd
+    //const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
 
+  
     /*
 
     for (const fixtureId of fixtureIds) {
