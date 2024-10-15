@@ -11,7 +11,7 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      console.log('Received request body:', requestBody);
+      console.log(' body:', requestBody);
       const { message } = requestBody;
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format:', requestBody);

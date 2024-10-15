@@ -4,10 +4,12 @@ import { Model } from 'mongoose';
 import { CreateBetDto } from './create-bet.dto';
 import Bet from './bet.interface'; // Asegúrate de que la ruta de importación sea correcta
 import { NotFoundException } from '@nestjs/common';
+import { MqttService } from '../mqtt/mqtt.service';
 
 @Injectable()
 export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
+  private readonly mqttService: MqttService,
 ) {}
 
 // En tu archivo bets.service.ts o como lo hayas nombrado
@@ -22,6 +24,24 @@ async findBetsByUserId(userId: string): Promise<Bet[]> {
   async createbet(createBetDto: CreateBetDto): Promise<Bet> {
     const createdBet = new this.betModel(createBetDto);
     await createdBet.save();
+
+    console.log("Creating a bet triggered by front signal")
+    // Mandar señal de post al mqtt
+    const message = {
+      request_id: createdBet._id,
+      group_id: createdBet.group_id,
+      fixture_id: createdBet.fixture_id,
+      league_name: createdBet.league_name,
+      round: createdBet.round,
+      date: createdBet.date,
+      result: createdBet.result,
+      deposit_token: "",
+      datetime: new Date().toISOString(),
+      quantity: createdBet.quantity,
+      seller: 0
+    };
+
+    await this.mqttService.publishToMqtt(JSON.stringify(message));
     return createdBet.toObject();
   }
 
