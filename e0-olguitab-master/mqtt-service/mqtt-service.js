@@ -1,15 +1,20 @@
 const mqtt = require('mqtt');
 const axios = require('axios');
+const express = require('express');
+const app = express();
+
+app.use(express.json());
 
 const client = mqtt.connect(process.env.MQTT_BROKER_URL, {
   username: process.env.MQTT_USERNAME,
   password: process.env.MQTT_PASSWORD,
 });
 
-
+  // ----- CONNECTION: SUSCRIBE TO TOPICS -----
 client.on('connect', () => {
   console.log('Connected to MQTT Broker');
-  // Suscribirse a ambos topics necesarios
+
+  // -- fixtures/info --
   client.subscribe('fixtures/info', (err) => {
     if (err) {
       console.error('Subscription error:', err);
@@ -17,6 +22,7 @@ client.on('connect', () => {
       console.log('Subscribed to topics: fixtures/info');
     }
   });
+  // -- fixtures/validation --
   client.subscribe('fixtures/validation', (err) => {
     if (err) {
       console.error('Subscription error:', err);
@@ -24,6 +30,7 @@ client.on('connect', () => {
       console.log('Subscribed to topics: fixtures/validation');
     }
   });
+  // -- fixtures/history --
   client.subscribe('fixtures/history', (err) => {
     if (err) {
       console.error('Subscription error (fixtures/history):', err);
@@ -32,44 +39,49 @@ client.on('connect', () => {
 
     }
   });
+  // -- fixtures/requests --
   client.subscribe('fixtures/requests', (err) => {
     if (err) {
       console.error('Subscription error (fixtures/requests):', err);
     } else {
       console.log('Subscribed to topic: fixtures/requests');
-        // Activa la bandera después de un breve retraso para evitar procesar mensajes inmediatamente después de suscribirse
     }
   });
 });
 
 
-// Mensajes
+// ----- MESSAGES: HANDLE POSTS -----
 client.on('message', async (topic, message) => {
 
+  //  -- fixtures/validation --
+  // Nueva idea: Si es false debemos sumar 1 a los bonos_disp
+  // Si es false y es de nuestro grupo debemos devolver la plata
+  // Si es de nuestro grupo debemos cambiar el estado de la bet/bond
+  // en resumen: update a AvailableBond en caso de ser false
+  //             & update a wallet si es de nuestro grupo y false
+  //             & update de estado del bono
   if (topic === 'fixtures/validation') {
     try {
       const parsedMessage = JSON.parse(message.toString());
-      console.log('Recibiendo validación...');
-      consoñe.log('Validation message:\n', message.toString());
+      console.log('Receiving validation...');
+      console.log('Validation message:\n', message.toString());
       const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
 
-      // Verificar si la respuesta está vacía. Ajusta esta condición según lo que esperes como respuesta vacía.
       if (getInfoResponse.data.length === 0) {
-        // Si está vacío, simplemente no hagas nada y retorna o sigue con otra lógica.
-        console.log('No hay datos para procesar.');
+        console.log('No data to process.');
         return;
       }
-        // Envuelve el parsedMessage en un objeto con una propiedad 'message'
         const payload = {
           message: parsedMessage
         };
       await axios.post(`${process.env.APP_URL}/validate-bet`, payload 
       );
     } catch (error) {
-      console.error('Error processing MQTT message VALIDACION:', error);
+      console.error('Error processing MQTT message VALIDATION:', error);
     }
+
+    // -- fixtures/info --
   } else if (topic === 'fixtures/info') {
-    // Procesar mensajes de fixtures/info como antes
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message, sending to app...');
@@ -78,20 +90,26 @@ client.on('message', async (topic, message) => {
         message: parsedMessage,
       });
     } catch (error) {
-      console.error('Error processing MQTT message:', error);
+      console.error('Error processing MQTT message INFO:', error);
+
+    // -- fixtures/requests --
+    // Nueva idea: update a fixtures_bonos_disponibles donde se le quite una unidad a los bonos disponibles
+    // No guardaremos los requests de nadie, no necesitamos ni si quiera que exista la tabla
+    // Solo serán señales para manejar la cant de bonos disponibles
     }} else if (topic === 'fixtures/requests') {
     try {
       const parsedMessage = JSON.parse(message.toString())
-      console.log('String JSON:', JSON.parse(message.toString()));
       console.log('Received message on fixtures/request, sending to app...');
-      console.log('Request listen message: \n', message.toString());
+      console.log('Received request string JSON:', JSON.parse(message.toString()));
 
+      // acá debería hacer el update, no el post
       await axios.post(`${process.env.APP_URL}/requests`, parsedMessage);
     } catch (error) {
-      console.error('Error processing MQTT message: REQUESTS', error);
+      console.error('Error processing MQTT message REQUEST:', error);
     }
   }
 
+  // -- fixtures/history --
   else if (topic === 'fixtures/history') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
@@ -103,42 +121,63 @@ client.on('message', async (topic, message) => {
         message: parsedMessage,
       });
     } catch (error) {
-      console.error('Error processing MQTT message: HISTORIA', error);
+      console.error('Error processing MQTT message HISTORY:', error);
     }
   }
 });
 
-async function fetchAndPublish() {
-  try {
-    // Primero, realiza una solicitud GET para obtener la información necesaria
-    const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
-    console.log('Información obtenida con éxito:', getInfoResponse.data);
 
-    // Verifica si getInfoResponse.data contiene algún elemento
-    if (getInfoResponse.data.length > 0) {
-      // Selecciona el primer objeto del array
-      const firstObject = getInfoResponse.data[0];
-      // Convierte el primer objeto a un string JSON
-      const messageString = JSON.stringify(firstObject);
-
-      // Publica el mensaje a MQTT y luego realiza la solicitud POST
-      client.publish('fixtures/requests', messageString, {}, async (err) => {
-        if (err) {
-          console.error('Error publishing message:', err);
-        } else {
-          console.log('Message published to fixtures/requests');
-          console.log('Bet placed successfully:', messageString);
-        }
-      });
-    } else {
-      console.log('No hay datos para enviar.');
+// ----- PUBLISHING: POSTING ON REQUESTS -----
+app.post('/publish', (req, res) => {
+  const { message } = req.body;
+  console.log("Publishing on requests channel, triggered by a bond creation ")
+  client.publish('fixtures/requests', message, (err) => {
+    if (err) {
+      console.error('Error publishing on MQTT', err);
+      return res.status(500).json({ message: 'Error publishing on MQTT' });
     }
+    console.log(`Message published on request:': ${message}`);
+    return res.status(200).json({ message: 'Published successfully on MQTT' });
+  });
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`MQTT Service listening on port ${PORT}`);
+});
+
+// async function fetchAndPublish() {
+//   try {
+//     // Primero, realiza una solicitud GET para obtener la información necesaria
+//     const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
+//     console.log('Información obtenida con éxito:', getInfoResponse.data);
+
+//     // Verifica si getInfoResponse.data contiene algún elemento
+//     if (getInfoResponse.data.length > 0) {
+//       // Selecciona el primer objeto del array
+//       const firstObject = getInfoResponse.data[0];
+//       // Convierte el primer objeto a un string JSON
+//       const messageString = JSON.stringify(firstObject);
+
+//       // Publica el mensaje a MQTT y luego realiza la solicitud POST
+//       client.publish('fixtures/requests', messageString, {}, async (err) => {
+//         if (err) {
+//           console.error('Error publishing message:', err);
+//         } else {
+//           console.log('Message published to fixtures/requests');
+//           console.log('Bet placed successfully:', messageString);
+//         }
+//       });
+//     } else {
+//       console.log('No hay datos para enviar.');
+//     }
     
-    setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de ejecutar de nuevo
-  } catch (getError) {
-    console.error('Error obteniendo información:', getError);
-    setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de intentar de nuevo
-  }
-}
+//     setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de ejecutar de nuevo
+//   } catch (getError) {
+//     console.error('Error obteniendo información:', getError);
+//     setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de intentar de nuevo
+//   }
+// }
 
 //fetchAndPublish();
+

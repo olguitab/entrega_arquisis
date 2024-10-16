@@ -1,7 +1,7 @@
 import { Schema, Document } from 'mongoose';
 
 export const FixtureSchema = new Schema({
-  bono_disponible: { type: Number, default: 40 },
+  //bono_disponible: { type: Number, default: 40 },
   fixture: {
     id: Number,
     referee: String,
