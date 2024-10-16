@@ -3,19 +3,20 @@ services:
     build: ./src
     ports:
       - "3001:3000"
-    networks:
-      - app-network
-    environment:
-      - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
-
-  app2:
-    build: ./src
-    ports:
       - "3002:3000"
     networks:
       - app-network
     environment:
       - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
+
+  # app2:
+  #   build: ./src
+  #   ports:
+  #     - "3002:3000"
+  #   networks:
+  #     - app-network
+  #   environment:
+  #     - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
 
   mqtt-service:
     build: ./mqtt-service
@@ -32,7 +33,7 @@ services:
       - app-network
 
   db:
-    image: mongo:latest
+    image: mongo:latest-alpine
     ports:
       - "27017:27017"
     volumes:
