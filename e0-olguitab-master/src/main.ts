@@ -6,12 +6,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Configuración detallada de CORS
+  /*
   app.enableCors({
     origin: '*', // Permitir solo este dominio específico
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     credentials: true, // Permitir envío de credenciales (cookies, headers de autenticación)
   });
+  */
 
   app.enableCors();
 
