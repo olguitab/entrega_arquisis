@@ -46,12 +46,7 @@ async findBetsByUserId(userId: string): Promise<Bet[]> {
 
     };
 
-    // Publicamos la solicitud de bet
     await this.mqttService.publishToMqtt(JSON.stringify(message));
-    // Reservamos el bond
-    console.log('Triggering the decrement of available bonds');
-    await this.availableBondsByFixtureService.decrementAvailableBonds(createdBet.fixture_id);
-
     return createdBet.toObject();
   }
 

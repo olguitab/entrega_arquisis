@@ -6,10 +6,10 @@ import { AvailableBondsByFixtureController } from './available-bonds-by-fixture.
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),  // Registrar el esquema
+    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),
   ],
-  providers: [AvailableBondsByFixtureService],  // Proveer el servicio
+  providers: [AvailableBondsByFixtureService],
   exports: [AvailableBondsByFixtureService],
-  controllers: [AvailableBondsByFixtureController],  // Registrar el controlador (si lo necesitas)
+  controllers: [AvailableBondsByFixtureController],
 })
 export class AvailableBondsByFixtureModule {}

@@ -54,28 +54,33 @@ client.on('connect', () => {
 client.on('message', async (topic, message) => {
 
   //  -- fixtures/validation --
-  // Nueva idea: Si es false debemos sumar 1 a los bonos_disp
   // Si es false y es de nuestro grupo debemos devolver la plata
   // Si es de nuestro grupo debemos cambiar el estado de la bet/bond
-  // en resumen: update a AvailableBond en caso de ser false
-  //             & update a wallet si es de nuestro grupo y false
+  // en resumen: update a wallet si es de nuestro grupo y false
   //             & update de estado del bono
   if (topic === 'fixtures/validation') {
     try {
       const parsedMessage = JSON.parse(message.toString());
       console.log('Receiving validation...');
       console.log('Validation message:\n', message.toString());
-      const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
 
-      if (getInfoResponse.data.length === 0) {
-        console.log('No data to process.');
-        return;
+      const fixtureId = parsedMessage.fixture_id;
+      const quantity = parsedMessage.quantity;
+      const validation = parsedMessage.validation;
+      console.log(`Fixture id associated to bond validation: ${fixtureId}`);
+
+      // Verificar que se recibieron los parámetros requeridos
+      if (!fixtureId || !quantity || validation === undefined) {
+        throw new Error('fixture_id, quantity o validation no proporcionado en el mensaje');
       }
-        const payload = {
-          message: parsedMessage
-        };
-      await axios.post(`${process.env.APP_URL}/validate-bet`, payload 
-      );
+
+      // Hacer una solicitud HTTP a la API para procesar la validación
+      const response = await axios.post(`${process.env.APP_URL}/available-bonds/validation`, {
+        fixtureId,
+        quantity,
+        validation
+      });
+
     } catch (error) {
       console.error('Error processing MQTT message VALIDATION:', error);
     }
@@ -93,17 +98,17 @@ client.on('message', async (topic, message) => {
       console.error('Error processing MQTT message INFO:', error);
 
     // -- fixtures/requests --
-    // Nueva idea: update a fixtures_bonos_disponibles donde se le quite una unidad a los bonos disponibles
-    // No guardaremos los requests de nadie, no necesitamos ni si quiera que exista la tabla
-    // Solo serán señales para manejar la cant de bonos disponibles
     }} else if (topic === 'fixtures/requests') {
     try {
       const parsedMessage = JSON.parse(message.toString())
       console.log('Received message on fixtures/request, sending to app...');
       console.log('Received request string JSON:', JSON.parse(message.toString()));
 
-      // acá debería hacer el update, no el post
-      await axios.post(`${process.env.APP_URL}/requests`, parsedMessage);
+      const fixtureId = parsedMessage.fixture_id;
+      const quantity = parsedMessage.quantity;
+      console.log(`Fixture id associated to bond request: ${fixtureId}`);
+
+      await axios.post(`${process.env.APP_URL}/available-bonds/${fixtureId}/decrement/${quantity}`);
     } catch (error) {
       console.error('Error processing MQTT message REQUEST:', error);
     }
