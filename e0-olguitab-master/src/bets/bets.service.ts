@@ -2,14 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBetDto } from './create-bet.dto';
-import Bet from './bet.interface'; // Asegúrate de que la ruta de importación sea correcta
+import Bet from './bet.interface'; 
 import { NotFoundException } from '@nestjs/common';
 import { MqttService } from '../mqtt/mqtt.service';
+import { AvailableBondsByFixtureService } from '../available-bonds/available-bonds-by-fixture.service';
+
 
 @Injectable()
 export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
   private readonly mqttService: MqttService,
+  private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
+
 ) {}
 
 // En tu archivo bets.service.ts o como lo hayas nombrado
@@ -39,9 +43,15 @@ async findBetsByUserId(userId: string): Promise<Bet[]> {
       datetime: new Date().toISOString(),
       quantity: createdBet.quantity,
       seller: 0
+
     };
 
+    // Publicamos la solicitud de bet
     await this.mqttService.publishToMqtt(JSON.stringify(message));
+    // Reservamos el bond
+    console.log('Triggering the decrement of available bonds');
+    await this.availableBondsByFixtureService.decrementAvailableBonds(createdBet.fixture_id);
+
     return createdBet.toObject();
   }
 

@@ -3,24 +3,48 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Fixture } from './fixtures.schema';
 import { BetService } from 'bets/bets.service';
+import { AvailableBondsByFixture } from 'available-bonds/available-bonds-by-fixture.schema';
+
 
 @Injectable()
 export class FixtureService {
-  constructor(@InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>,
-  private readonly betService: BetService) {}
+  constructor(
+    @InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>,
+    @InjectModel('AvailableBondsByFixture') private readonly availableBondsByFixtureModel: Model<AvailableBondsByFixture>,
+    private readonly betService: BetService
+    ) {}
 
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
     const updatedFixtures = await Promise.all(
       fixturesData.map(async (fixtureData) => {
-        return await this.fixtureModel.findOneAndUpdate(
+        const updatedFixture = await this.fixtureModel.findOneAndUpdate(
           { 'fixture.id': fixtureData.fixture.id },  // busca id
           fixtureData,  // si lo encuentra actualiza
           { upsert: true, new: true }  // si no lo encuentra, inserta (eso hace el upsert)
         );
+
+        // Revisar si ya existe el AvailableBonds
+        console.log(`Checking if the fixture with id ${updatedFixture.fixture.id} has an AvailableBond associated`)
+        const existingAvailableBond = await this.availableBondsByFixtureModel.findOne({
+          fixtureId: updatedFixture.fixture.id,
+        });
+        console.log(`Result: ${existingAvailableBond}`)
+        // Si no existe, crear el AvailableBonds asociado al fixture
+        if (!existingAvailableBond) {
+          console.log("Creating an AvailableBond");
+          await this.availableBondsByFixtureModel.create({
+            fixtureId: updatedFixture.fixture.id, 
+            availableBonds: 40 
+          });
+        }
+
+        return updatedFixture;
       })
     );
+
     return updatedFixtures;
   }
+
 
   async getAllFixtures(page: number, count: number, filters: any): Promise<Fixture[]> {
     const query = this.fixtureModel.find(filters);
