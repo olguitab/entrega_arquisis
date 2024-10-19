@@ -16,6 +16,7 @@ interface Bet {
     ipAddress?: string; // Dirección IP del usuario
     country?: string;  // País obtenido de la IP
     city?: string;
+    status: string;
   }
 
   export default Bet;

@@ -52,15 +52,12 @@ export class BetService {
     return this.betModel.find({ fixture_id: fixtureId }).exec();
   }
 
-  async updateBetResult(requestId: string, result: string): Promise<void> {
+  async updateBetStatus(requestId: string, status: string): Promise<void> {
     const bet = await this.betModel.findOne({ request_id: requestId }).exec();
-
     if (!bet) {
       throw new NotFoundException(`Bet with request ID ${requestId} not found`);
     }
-
-    //bet.checked_result = true;
+    bet.status = status;
     await bet.save();
-
   }
 }

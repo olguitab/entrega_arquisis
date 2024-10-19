@@ -6,9 +6,9 @@ import { FixtureService } from './fixtures/fixtures.service';
 import { InitializationService } from 'initialization/initialization.service';
 import { UsersModule } from 'user/user.module';
 import { BetModule } from 'bets/bets.module';
+import { BetSchema } from 'bets/bet.schema';
 
 import { FixturesModule } from 'fixtures/fixtures.module';
-import { BetSchema } from 'bets/bet.schema';
 import { PreValidateBetModule } from 'bets/pre-validate-bet/pre-validate-bet.module';
 import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
 import { WalletModule } from 'wallet/wallet.module';
@@ -23,7 +23,8 @@ import { RequestModule } from 'requests/requests.module';
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI),
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
-    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),  // Registrar el modelo en el AppModule
+    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),  // Regis trar el modelo en el AppModule
+    MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
     UsersModule,
     BetModule,
     FixturesModule,

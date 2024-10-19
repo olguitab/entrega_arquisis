@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Fixture } from './fixtures.schema';
 import { BetService } from 'bets/bets.service';
 import { AvailableBondsByFixture } from 'available-bonds/available-bonds-by-fixture.schema';
+import { WalletService } from 'wallet/wallet.service';
 
 
 @Injectable()
@@ -11,7 +12,8 @@ export class FixtureService {
   constructor(
     @InjectModel('Fixture') private readonly fixtureModel: Model<Fixture>,
     @InjectModel('AvailableBondsByFixture') private readonly availableBondsByFixtureModel: Model<AvailableBondsByFixture>,
-    private readonly betService: BetService
+    private readonly betService: BetService,
+    private readonly walletService: WalletService
     ) {}
 
   async createOrUpdateFixtures(fixturesData: any[]): Promise<any[]> {
@@ -145,9 +147,6 @@ export class FixtureService {
       let odd;
       // hacer un map de los odds porque son siempre 3 y typescript webea mas q la chucha
       const odds = fixture.odds[0].values.map((value) => value);
-      // console.log('Fixture id:', fixtureId);
-      // console.log('Odds:', odds);
-
 
       if (homeGoals === null || awayGoals === null|| fixture.odds[0].values[0].odd === null) 
       {
@@ -183,40 +182,27 @@ export class FixtureService {
       console.log('Winner:', winner);
 
       const bets = await this.betService.findBetsByFixtureId(fixtureId);
-      //console.log('Bets:', bets);
+      console.log('Bets:', bets);
 
 
+      for (const bet of bets) {
+        if (bet.status === 'Validated') { // en los otros casos como Pending, Won, Lost, no se hace nada
+          if (bet.result === winner) {
+            // que cambie el status a Won y se le añada el dinero a su wallet
+            console.log('Bet ganado:', bet);
+            console.log('Ganador:', winner);
+            await this.betService.updateBetStatus(bet.request_id, 'Won');
+            const moneyWon = bet.quantity * 1000 * odd;
+            await this.walletService.updateWalletBalance(bet.id_usuario, moneyWon);
 
-
-      
-      // for (const bet of bets) {
-      //   if (bet.checked_result) {
-      //     continue;
-      //   }
-
-      //   else {
-      //     await this.betService.updateBetResult(bet.request_id, winner);
-
-      //     if (bet.result === winner) {
-      //       // actualiza el bono
-      //       //console.log('Bono ganado:', bet);
-      //       const money = bet.quantity * 1000 * odd;
-      //     }
-      //     else {
-      //       //console.log('Bono perdido:', bet);
-      //     }
-      //   }
-      // }
-
-      // for (const bet of bets) {
-      //   if (bet.status === 'Pending') {
-      //     if (bet.result === winner) {
-      //       await this.betService.updateBetStatus(bet.request_id, 'Won');
-      //     } else {
-      //       await this.betService.updateBetStatus(bet.request_id, 'Lost');
-      //     }
-      //   }
-      // }
+          } else {
+            // cambio de estado a Lost y nada más
+            console.log('Bet perdido:', bet);
+            console.log('Ganador:', winner);
+            await this.betService.updateBetStatus(bet.request_id, 'Lost');
+          }
+        }
+      }
     }
 
     
