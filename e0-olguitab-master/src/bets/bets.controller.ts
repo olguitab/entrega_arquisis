@@ -5,10 +5,11 @@ import { BetService } from './bets.service';
 import { CreateBetDto } from './create-bet.dto';
 import Bet from './bet.interface';
 import { getLocationFromIP } from './location'; // Asegúrate de que la ruta de importación sea correcta
+import { WalletService } from 'wallet/wallet.service';
 
 @Controller('api/bet')
 export class BetController {
-  constructor(private readonly betService: BetService) {}
+  constructor(private readonly betService: BetService, private readonly walletService: WalletService) {}
 
   @Get('history/:userId') // Define la ruta para aceptar un userId como parámetro
   async findHistoryByUserId(@Param('userId') userId: string): Promise<Bet[]> {
@@ -43,6 +44,9 @@ export class BetController {
       // Maneja el error según sea necesario
     }
     
-    return this.betService.createbet(createBetDto);
+    const createdBet = await this.betService.createbet(createBetDto);
+    const moneySpent = createdBet.quantity * 1000;
+    this.walletService.updateWalletBalance(createdBet.id_usuario, -moneySpent); 
+    return createdBet;
   }
 }

@@ -9,7 +9,7 @@ export const BetSchema = new mongoose.Schema({
   round: String,
   date: String,
   result: String,
-  deposit_token: { type: String, default: ' ' }, // Si el depósito puede ser opcional, puedes establecer un valor predeterminado
+  deposit_token: { type: String, default: '' }, // Si el depósito puede ser opcional, puedes establecer un valor predeterminado
   datetime: String,
   quantity: Number,
   seller: Number,
