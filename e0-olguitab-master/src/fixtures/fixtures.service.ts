@@ -103,29 +103,34 @@ export class FixtureService {
 
     if (!Array.isArray(fixturesData)) {
       throw new Error('fixturesData is not an array');
-  }
+    }
 
     console.log('Primer elemento:', fixturesData[0]);
     console.log('Fixture', fixturesData[0].fixture);
     const updatedFixtures = await Promise.all(
-        fixturesData.map(async (fixtureData) => {
+        fixturesData.map((fixtureData) => {
           
         const fixtureId = fixtureData.fixture.id;
   
-        return await this.fixtureModel.findOneAndUpdate(
+        return this.fixtureModel.findOneAndUpdate(
           { 'fixture.id': fixtureId }, 
           { $set: fixtureData }, // actualiza solo los campos que se pasan desde history
           { new: true, upsert: false } // no crear fixture si no existe
         ).exec();
       })
     );
-    //console.log('Fixtures actualizadas:', updatedFixtures.length);
 
     // hay que cambiar este fixture que es el que no existe xd
-    //const fixtureIds = updatedFixtures.map(fixture => fixture.fixture.id);
+    const fixtureIds = updatedFixtures
+      .filter(fixture => fixture !== null) // Filtra los fixtures que no fueron encontrados
+      .filter(fixture => fixture.fixture.status.short === 'FT') // Filtra los fixtures que ya han sido jugados
+      // revisar que esté bien que sea FT
+      .map(fixture => fixture.fixture.id);
+
+    console.log('Fixture IDs in process history map before checking bets:', fixtureIds);
 
   
-    /*
+    // TO DO: refactorizar a bets.service, primero ver que funcione bien
 
     for (const fixtureId of fixtureIds) {
       const fixture = await this.fixtureModel.findOne({ 'fixture.id': fixtureId }).exec();
@@ -138,47 +143,84 @@ export class FixtureService {
       // ver casos que vienen nulos
       let winner;
       let odd;
-      if (homeGoals === null || awayGoals === null|| fixture.odds[0].values[0].odd === null || fixture.odds.values.length === 0) 
+      // hacer un map de los odds porque son siempre 3 y typescript webea mas q la chucha
+      const odds = fixture.odds[0].values.map((value) => value);
+      // console.log('Fixture id:', fixtureId);
+      // console.log('Odds:', odds);
+
+
+      if (homeGoals === null || awayGoals === null|| fixture.odds[0].values[0].odd === null) 
       {
+        console.log('Fixture ID:', fixtureId);
+        console.log('Home Team:', homeTeam);
+        console.log('Away Team:', awayTeam);
+        console.log('Home Goals:', homeGoals);
+        console.log('Away Goals:', awayGoals);
+        console.log('an odd', fixture.odds[0].values[0].odd);
+        console.log("This fixture has null values, skipping");
         continue;
       }
       if (homeGoals > awayGoals) {
         winner = homeTeam;
-        odd = fixture.odds[0].values[0].odd;
+        //odd = fixture.odds[0].values[0].odd;
+        odd = odds[0].odd;
       } else if (awayGoals > homeGoals) {
         winner = awayTeam;
-        odd = fixture.odds[0].values[2].odd;
+        //odd = fixture.odds[0].values[2].odd;
+        odd = odds[2].odd;
       } else if (homeGoals === awayGoals) {
         winner = '---';
-        odd = fixture.odds[0].values[1].odd;
+        //odd = fixture.odds[0].values[1].odd;
+        odd = odds[1].odd;
       }
       else {
         winner = null;
       }
+      // imprimir ganador e id del partido
+      console.log('Fixture ID:', fixtureId);
+      console.log('Home Team:', homeTeam);
+      console.log('Away Team:', awayTeam);
+      console.log('Winner:', winner);
 
       const bets = await this.betService.findBetsByFixtureId(fixtureId);
+      //console.log('Bets:', bets);
 
-      for (const bet of bets) {
-        if (bet.checked_result) {
-          continue;
-        }
 
-        else {
-          await this.betService.updateBetResult(bet.request_id, winner);
 
-          if (bet.result === winner) {
-            // actualiza el bono
-            //console.log('Bono ganado:', bet);
-            const money = bet.quantity * 1000 * odd;
-          }
-          else {
-            //console.log('Bono perdido:', bet);
-          }
-        }
-      }
 
+      
+      // for (const bet of bets) {
+      //   if (bet.checked_result) {
+      //     continue;
+      //   }
+
+      //   else {
+      //     await this.betService.updateBetResult(bet.request_id, winner);
+
+      //     if (bet.result === winner) {
+      //       // actualiza el bono
+      //       //console.log('Bono ganado:', bet);
+      //       const money = bet.quantity * 1000 * odd;
+      //     }
+      //     else {
+      //       //console.log('Bono perdido:', bet);
+      //     }
+      //   }
+      // }
+
+      // for (const bet of bets) {
+      //   if (bet.status === 'Pending') {
+      //     if (bet.result === winner) {
+      //       await this.betService.updateBetStatus(bet.request_id, 'Won');
+      //     } else {
+      //       await this.betService.updateBetStatus(bet.request_id, 'Lost');
+      //     }
+      //   }
+      // }
     }
-    */
+
+    
+    
     
     return updatedFixtures; 
   }
