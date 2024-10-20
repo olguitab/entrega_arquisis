@@ -9,7 +9,7 @@ export class WalletController {
   @Post('add-money')
   async addMoney(@Body() requestBody: any): Promise<void> {
     const { user_id, amount } = requestBody;
-    return this.walletService.addMoneyToWallet(user_id, amount);
+    return this.walletService.updateWalletBalance(user_id, amount);
   }
 
   @Get('balance/:user_id')

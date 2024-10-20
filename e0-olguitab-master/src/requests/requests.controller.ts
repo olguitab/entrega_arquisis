@@ -38,5 +38,13 @@ export class RequestsController {
     const totalBonusAvailable = 40 - totalRequest;
     return totalBonusAvailable;
   }
+
+  @Post('validation')
+  async validateRequest(@Body() requestBody: any): Promise<any> {
+    // acá hacer todo lo que se necesita para procesar la respuesta de la validación
+    console.log('Received validation request:', requestBody);
+
+    await this.requestsService.updateRequestValidation(requestBody);
+  }
   
 };

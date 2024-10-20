@@ -11,7 +11,7 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      console.log('Received request body:', requestBody);
+      console.log(' body:', requestBody);
       const { message } = requestBody;
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format:', requestBody);
@@ -21,10 +21,10 @@ export class FixturesController {
         };
       }
       const fixtures = message.fixtures;
-      console.log('Processing fixtures:', fixtures);
+      //console.log('Processing fixtures:', fixtures);
 
       const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-      console.log('Saved fixtures:', savedFixtures);
+      //console.log('Saved fixtures:', savedFixtures);
 
       return {
         statusCode: HttpStatus.CREATED,
@@ -79,13 +79,18 @@ export class FixturesController {
         },
       };
     }
+    return {
+      isValid: true,
+    };
   }
   
   @Patch('history')
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      //console.log('Enter patch for history');
       const { message } = requestBody;
+      console.log('Enter patch for history');
+      console.log('Received message:', message);
+    
   
       // Usar la función de validación
       const validation = this.validateMessage(message);
