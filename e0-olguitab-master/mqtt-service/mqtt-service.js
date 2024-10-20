@@ -75,6 +75,7 @@ client.on('message', async (topic, message) => {
       }
 
       // Hacer una solicitud HTTP a la API para procesar la validación
+      // MALO! solo recibo request_id, valid, y group_id
       const response = await axios.post(`${process.env.APP_URL}/available-bonds/validation`, {
         fixtureId,
         quantity,
@@ -107,7 +108,7 @@ client.on('message', async (topic, message) => {
       const fixtureId = parsedMessage.fixture_id;
       const quantity = parsedMessage.quantity;
       console.log(`Fixture id associated to bond request: ${fixtureId}`);
-
+      
       await axios.post(`${process.env.APP_URL}/available-bonds/${fixtureId}/decrement/${quantity}`);
     } catch (error) {
       console.error('Error processing MQTT message REQUEST:', error);
