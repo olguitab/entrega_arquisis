@@ -203,10 +203,7 @@ export class FixtureService {
           }
         }
       }
-    }
-
-    
-    
+    }  
     
     return updatedFixtures; 
   }

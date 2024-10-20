@@ -60,15 +60,25 @@ client.on('message', async (topic, message) => {
   //             & update de estado del bono
   if (topic === 'fixtures/validation') {
     try {
-      const parsedMessage = JSON.parse(message.toString());
+      const data = JSON.parse(message.toString());
       console.log('Receiving validation...');
       console.log('Validation message:\n', message.toString());
 
-      const fixtureId = parsedMessage.fixture_id;
-      const quantity = parsedMessage.quantity;
-      const validation = parsedMessage.validation;
-      console.log(`Fixture id associated to bond validation: ${fixtureId}`);
+      // todo esto no se está recibiendo
+      // const fixtureId = parsedMessage.fixture_id;
+      // const quantity = parsedMessage.quantity;
+      // const validation = parsedMessage.validation;
+      // console.log(`Fixture id associated to bond validation: ${fixtureId}`);
 
+
+
+      // lo que se tiene que hacer es: 1. revisar group_id y actualizar nuestro bet si es de nuestro grupo
+
+      // mandar la info a requests para que se maneja bien no más
+      const response = await axios.post(`${process.env.APP_URL}/requests/validation`, data);
+    
+
+      /*
       // Verificar que se recibieron los parámetros requeridos
       if (!fixtureId || !quantity || validation === undefined) {
         throw new Error('fixture_id, quantity o validation no proporcionado en el mensaje');
@@ -81,6 +91,7 @@ client.on('message', async (topic, message) => {
         quantity,
         validation
       });
+      */
 
     } catch (error) {
       console.error('Error processing MQTT message VALIDATION:', error);

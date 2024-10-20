@@ -20,7 +20,7 @@ export const BetSchema = new Schema({
     type: String, 
     enum: ["Pending", "Validated", "Rejected", "Won", "Lost"], 
     default: "Pending" 
-  },
+  }
 });
 
 export interface Bet extends Document {
@@ -39,5 +39,6 @@ export interface Bet extends Document {
   ipAddress: string;
   country: string;
   city: string;
-  status: 'Pending' | 'Validated' | 'Rejected' | 'Won' | 'Lost';
+  //status: 'Pending' | 'Validated' | 'Rejected' | 'Won' | 'Lost';
+  status: string; // Cambia el tipo de enumeración a string
 }

@@ -3,7 +3,7 @@ import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { BetService } from './bets.service';
 import { CreateBetDto } from './create-bet.dto';
-import Bet from './bet.interface';
+import { Bet } from './bet.schema';
 import { getLocationFromIP } from './location'; // Asegúrate de que la ruta de importación sea correcta
 import { WalletService } from 'wallet/wallet.service';
 
@@ -16,7 +16,10 @@ export class BetController {
     return this.betService.findBetsByUserId(userId);
   }
 
-  @Get() findAll(): Promise<Bet[]> { return this.betService.findAll(); }
+  @Get() 
+  findAll(): Promise<Bet[]> { 
+    return this.betService.findAll(); 
+  }
 
 
   @Post()
