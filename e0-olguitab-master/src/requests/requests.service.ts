@@ -48,7 +48,7 @@ export class RequestsService {
     const bet_request = our_bet || other_bet;
 
     if (!bet_request) {
-      console.log('No se encontró la solicitur de validación de apuesta con request_id:', request_id);
+      console.log('No se encontró la solicitud de validación de apuesta con request_id:', request_id);
       return;
     }
 
