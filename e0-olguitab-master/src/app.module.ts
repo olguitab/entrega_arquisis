@@ -17,13 +17,15 @@ import { AvailableBondsByFixtureSchema } from 'available-bonds/available-bonds-b
 
 import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
 import { RequestModule } from 'requests/requests.module';
+import { WebpayModule } from 'webpay/webpay.module';
+
 
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI),
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
-    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),  // Regis trar el modelo en el AppModule
+    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
     UsersModule,
     BetModule,
@@ -32,6 +34,7 @@ import { RequestModule } from 'requests/requests.module';
     ValidateBetModule,
     WalletModule,
     RequestModule,  
+    WebpayModule,
   ],
   controllers: [FixturesController],
   providers: [FixtureService, InitializationService],

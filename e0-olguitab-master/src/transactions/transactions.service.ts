@@ -1,21 +1,51 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { AnyArray, Model } from 'mongoose';
 import { Transaction } from './transactions.schema';
 import { Bet } from 'bets/bet.schema';
+import { WebpayService } from 'webpay/webpay.service';
 
 @Injectable()
 export class TransactionService {
     constructor(
+        private readonly webpayService: WebpayService,
         @InjectModel('Transaction') private transactionModel: Model<Transaction>,
     ) {}
 
     // Crear una transacción
-    async create(transactionData: Partial<Transaction>): Promise<Transaction> {
-        const newTransaction = new this.transactionModel(transactionData);
+    async create(transactionData: Partial<Transaction>): Promise<any> {
+        // primero crear la transaccion de webpay
+        // como sessionId puedo usar la walletid o la betid, debo verificar cual de las dos existe y usar esa
+        // obtengo el token y el url
+        // creo la transaction con los parametros que recibe la funcion + los obtenidos por webpay
+
+        const walletId = transactionData.walletId;
+        const betId = transactionData.betId;
+
+        // Parametros para la transaccion de webpay
+        const sessionId = walletId || betId;
+        const returnUrl = `http://localhost:8000`;
+        const amount = transactionData.amount;
+
+        const response = await this.webpayService.createTransaction(amount, sessionId, returnUrl);
+
+        const url = response.url;
+        const token = response.token;
+
+        const transactionDetails = {
+            token: token,
+            amount: amount,
+            status: "pending",
+            betId: betId,
+            walletId: walletId,
+        };
+
+        const newTransaction = new this.transactionModel(transactionDetails);
+        const savedTransaction = await newTransaction.save();
         console.log("Creating a transaction");
         console.log(newTransaction);
-        return newTransaction.save();
+
+        return { url, savedTransaction };
     }
 
     // Obtener todas las transacciones

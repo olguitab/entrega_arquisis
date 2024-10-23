@@ -7,6 +7,7 @@ import { NotFoundException } from '@nestjs/common';
 import { MqttService } from '../mqtt/mqtt.service';
 import { AvailableBondsByFixtureService } from '../available-bonds/available-bonds-by-fixture.service';
 import { WalletService } from '../wallet/wallet.service';
+import { TransactionService } from 'transactions/transactions.service';
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
   private readonly mqttService: MqttService,
   private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
-  private readonly walletService: WalletService
+  private readonly walletService: WalletService,
+  private readonly transactionService: TransactionService
 
 ) {}
 
@@ -36,6 +38,10 @@ export class BetService {
     // al usar webpay, cambiar a false
     const usingWallet = true;
 
+    // TO DO: crear una transaccion con los datos correspondientes, en este caso se debe pasar beyId, amount, etc
+    // if (!usingWallet){
+    //   const transaction = await this.transactionService.create();
+    // }
 
     // TODO: cambiar request_id por uuid
     const message = {
