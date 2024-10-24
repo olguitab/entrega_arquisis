@@ -101,7 +101,8 @@ client.on('message', async (topic, message) => {
   } else if (topic === 'fixtures/info') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
-      console.log('Received message, sending to app...');
+      // console.log('Received message, sending to app...');
+      // console.log('Info message:\n', message.toString());
       await axios.post(`${process.env.APP_URL}/fixtures/process`, {
         topic,
         message: parsedMessage,
@@ -131,7 +132,7 @@ client.on('message', async (topic, message) => {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message on fixtures/history, sending to app...');
-      console.log('History message:\n', message.toString());
+      // console.log('History message:\n', message.toString());
 
       await axios.patch(`${process.env.APP_URL}/fixtures/history`, {
         topic,

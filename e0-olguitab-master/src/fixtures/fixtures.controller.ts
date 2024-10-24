@@ -11,7 +11,7 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      console.log(' body:', requestBody);
+      // console.log(' body:', requestBody);
       const { message } = requestBody;
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format:', requestBody);
@@ -88,8 +88,8 @@ export class FixturesController {
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
       const { message } = requestBody;
-      console.log('Enter patch for history');
-      console.log('Received message:', message);
+      // console.log('Enter patch for history');
+      // console.log('Received message:', message);
     
   
       // Usar la función de validación
