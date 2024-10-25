@@ -23,6 +23,7 @@ export class WebpayService {
         } catch (error) {
         console.error('Error creando transacción:', error);
         throw new Error('Error al crear la transacción');
+        //localhost:4000/bets/ID/confirmed
         }
     }
 

@@ -38,7 +38,7 @@ export class BetService {
     // al usar webpay, cambiar a false
     const usingWallet = true;
 
-    // TO DO: crear una transaccion con los datos correspondientes, en este caso se debe pasar beyId, amount, etc
+    // TO DO: crear una transaccion con los datos correspondientes, en este caso se debe pasar betId, amount, etc
     // if (!usingWallet){
     //   const transaction = await this.transactionService.create();
     // }

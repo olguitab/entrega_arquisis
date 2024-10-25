@@ -18,6 +18,9 @@ import { AvailableBondsByFixtureSchema } from 'available-bonds/available-bonds-b
 import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
 import { RequestModule } from 'requests/requests.module';
 import { WebpayModule } from 'webpay/webpay.module';
+import { TransactionModule } from 'transactions/transactions.module'
+import { TransactionSchema } from 'transactions/transactions.schema'
+
 
 
 
@@ -27,6 +30,7 @@ import { WebpayModule } from 'webpay/webpay.module';
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
     MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
+    MongooseModule.forFeature([{ name: 'Transaction', schema: TransactionSchema }]),
     UsersModule,
     BetModule,
     FixturesModule,
@@ -35,6 +39,7 @@ import { WebpayModule } from 'webpay/webpay.module';
     WalletModule,
     RequestModule,  
     WebpayModule,
+    TransactionModule,
   ],
   controllers: [FixturesController],
   providers: [FixtureService, InitializationService],

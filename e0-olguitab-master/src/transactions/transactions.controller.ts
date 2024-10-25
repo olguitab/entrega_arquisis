@@ -18,21 +18,21 @@ export class TransactionController {
         return this.transactionService.findAll();
     }
 
-    // Obtener una transacción por ID
-    @Get(':id')
-    async findOne(@Param('id') id: string) {
-        return this.transactionService.findOne(id);
-    }
+    // // Obtener una transacción por ID
+    // @Get(':id')
+    // async findOne(@Param('id') id: string) {
+    //     return this.transactionService.findOne(id);
+    // }
 
-    // Actualizar una transacción por ID
-    @Patch(':id')
-    async update(@Param('id') id: string, @Body() updateData: Partial<Transaction>) {
-        return this.transactionService.update(id, updateData);
-    }
+    // // Actualizar una transacción por ID
+    // @Patch(':id')
+    // async update(@Param('id') id: string, @Body() updateData: Partial<Transaction>) {
+    //     return this.transactionService.update(id, updateData);
+    // }
 
-    // Eliminar una transacción por ID
-    @Delete(':id')
-    async remove(@Param('id') id: string) {
-        return this.transactionService.remove(id);
-    }
+    // // Eliminar una transacción por ID
+    // @Delete(':id')
+    // async remove(@Param('id') id: string) {
+    //     return this.transactionService.remove(id);
+    // }
 }

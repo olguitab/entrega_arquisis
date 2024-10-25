@@ -1,4 +1,5 @@
 import { Schema, Document } from 'mongoose';
+import Transaction from 'transbank-sdk/dist/es5/transbank/webpay/webpay_plus/transaction';
 
 export const BetSchema = new Schema({
   id_usuario: String,
@@ -43,4 +44,5 @@ export interface Bet extends Document {
   //status: 'Pending' | 'Validated' | 'Rejected' | 'Won' | 'Lost';
   status: string; // Cambia el tipo de enumeración a string
   wallet: boolean;
+  //transaction: Transaction;
 }

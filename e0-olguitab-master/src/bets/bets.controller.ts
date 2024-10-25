@@ -52,9 +52,12 @@ export class BetController {
     }
     
     const createdBet = await this.betService.createbet(createBetDto);
+
+    /* Esto debe estar directamente en wallet
     const moneySpent = createdBet.quantity * 1000;
     this.walletService.updateWalletBalance(createdBet.id_usuario, -moneySpent); 
-    await this.transactionService.checkBetCreation(createdBet);
+    */
+    // await this.transactionService.checkBetCreation(createdBet);
     return createdBet;
   }
 }
