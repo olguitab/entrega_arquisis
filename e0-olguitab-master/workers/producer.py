@@ -1,8 +1,5 @@
 import os
-
-# FastAPI
 from fastapi import FastAPI
-
 # celery
 from celery_config.tasks import wait_and_return, sum_to_n_job
 from models import Number

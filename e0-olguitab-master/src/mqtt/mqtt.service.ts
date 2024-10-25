@@ -4,7 +4,7 @@ import { JsonWebKeyInput } from 'node:crypto';
 
 @Injectable()
 export class MqttService {
-    private mqttServiceUrl = process.env.MQTT_SERVICE_URL || 'http://mqtt-service:3000/publish';
+    private mqttServiceUrl = process.env.MQTT_SERVICE_URL || 'http://mqtt-service:3003/publish';
 
     async publishToMqtt(message: string): Promise<void> {
         try {

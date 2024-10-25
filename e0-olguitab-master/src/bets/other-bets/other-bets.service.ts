@@ -11,24 +11,10 @@ export class OtherBetsService {
   constructor(@InjectModel('OtherBet') private otherBetModel: Model<OtherBet>) {}
 
 
-  create(createOtherBetDto: CreateOtherBetDto) {
-    return 'This action adds a new otherBet';
-  }
-
-  findAll() {
-    return `This action returns all otherBets`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} otherBet`;
-  }
-
-  update(id: number, updateOtherBetDto: UpdateOtherBetDto) {
-    return `This action updates a #${id} otherBet`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} otherBet`;
+  async createOtherBet(createOtherBetDto: CreateOtherBetDto): Promise<void> {
+    console.log("Receiving a bet triggered by another group");
+    const createdBet = new this.otherBetModel(createOtherBetDto);
+    await createdBet.save();
   }
 
   async findBetByRequestId(requestId: string): Promise<OtherBet> {

@@ -64,34 +64,8 @@ client.on('message', async (topic, message) => {
       console.log('Receiving validation...');
       console.log('Validation message:\n', message.toString());
 
-      // todo esto no se está recibiendo
-      // const fixtureId = parsedMessage.fixture_id;
-      // const quantity = parsedMessage.quantity;
-      // const validation = parsedMessage.validation;
-      // console.log(`Fixture id associated to bond validation: ${fixtureId}`);
-
-
-
-      // lo que se tiene que hacer es: 1. revisar group_id y actualizar nuestro bet si es de nuestro grupo
-
-      // mandar la info a requests para que se maneja bien no más
       const response = await axios.post(`${process.env.APP_URL}/requests/validation`, data);
     
-
-      /*
-      // Verificar que se recibieron los parámetros requeridos
-      if (!fixtureId || !quantity || validation === undefined) {
-        throw new Error('fixture_id, quantity o validation no proporcionado en el mensaje');
-      }
-
-      // Hacer una solicitud HTTP a la API para procesar la validación
-      // MALO! solo recibo request_id, valid, y group_id
-      const response = await axios.post(`${process.env.APP_URL}/available-bonds/validation`, {
-        fixtureId,
-        quantity,
-        validation
-      });
-      */
 
     } catch (error) {
       console.error('Error processing MQTT message VALIDATION:', error);
@@ -101,7 +75,7 @@ client.on('message', async (topic, message) => {
   } else if (topic === 'fixtures/info') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
-      // console.log('Received message, sending to app...');
+      console.log('Received fixtures/info message, sending to app...');
       // console.log('Info message:\n', message.toString());
       await axios.post(`${process.env.APP_URL}/fixtures/process`, {
         topic,
@@ -117,11 +91,11 @@ client.on('message', async (topic, message) => {
       console.log('Received message on fixtures/request, sending to app...');
       console.log('Received request string JSON:', JSON.parse(message.toString()));
 
-      const fixtureId = parsedMessage.fixture_id;
-      const quantity = parsedMessage.quantity;
-      console.log(`Fixture id associated to bond request: ${fixtureId}`);
-      
-      await axios.post(`${process.env.APP_URL}/available-bonds/${fixtureId}/decrement/${quantity}`);
+      // se está procesando acá dentro del process request el decremento de los bonos
+      await axios.post(`${process.env.APP_URL}/requests/process`, {
+        topic,
+        message: parsedMessage,
+      });
     } catch (error) {
       console.error('Error processing MQTT message REQUEST:', error);
     }
@@ -159,7 +133,7 @@ app.post('/publish', (req, res) => {
   });
 });
 
-const PORT = 3000;
+const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`MQTT Service listening on port ${PORT}`);
 });
