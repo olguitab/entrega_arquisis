@@ -26,7 +26,7 @@ export class TransactionService {
         const sessionId = walletId || betId;
         // este url es a donde nos redireccionará webpay una vez que se haya realizado la transacción
         // debemos crearlo todavia, puede ser una página de transaccion exitosa y el resultado
-        const returnUrl = `http://localhost:4000`;
+        const returnUrl = `http://localhost:4000/successful-purchase`;
         const amount = transactionData.amount;
 
         const response = await this.webpayService.createTransaction(amount, sessionId, returnUrl);
