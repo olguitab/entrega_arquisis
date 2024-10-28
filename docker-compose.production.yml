@@ -1,6 +1,8 @@
 services:
   app1:
-    build: ./src
+    build:
+      context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app1
+    image: public.ecr.aws/h5y6i3a7/futbet23:app1
     ports:
       - "3001:3000"
     networks:
@@ -9,7 +11,9 @@ services:
       - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
 
   app2:
-    build: ./src
+    build:
+      context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app2
+    image: public.ecr.aws/h5y6i3a7/futbet23:app2
     ports:
       - "3002:3000"
     networks:
@@ -18,14 +22,15 @@ services:
       - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
 
   mqtt-service:
-    build: ./mqtt-service
+    build:
+      context: ./mqtt-service  # Asegúrate de que este sea el directorio donde está tu Dockerfile para mqtt-service
+    image: public.ecr.aws/h5y6i3a7/futbet23:mqtt-service
     depends_on:
       - db
     environment:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
       - MQTT_PASSWORD=iic2173-2024-2-students
-      #- APP_URL=http://app1:3001  # Cambia esto a app1 o app2 según el servicio que desees
       - APP_URL=http://app1
     ports:
       - "1884:1884"
@@ -41,11 +46,9 @@ services:
     networks:
       - app-network
 
-
 networks:
   app-network:
     driver: bridge
 
 volumes:
   mongo-data:
-
