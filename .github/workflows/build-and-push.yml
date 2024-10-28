@@ -16,20 +16,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID0 }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY0 }}
-          aws-region: us-east-2
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID0}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY0}}
+          aws-region: us-east-1
 
-      - name: Login to Amazon ECR Public
-        env:
-          AWS_DEFAULT_REGION: us-east-2
-          AWS_REGION: us-east-2
-        run: |
-          aws ecr-public get-login-password --region us-east-2 | docker login --username AWS --password-stdin public.ecr.aws/v9b5f4l8
+      - name: Login to Amazon ECR
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+          mask-password: "true"
 
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
