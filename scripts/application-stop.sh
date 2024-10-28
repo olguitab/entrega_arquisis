@@ -1,13 +1,15 @@
 #!/bin/bash
 
 echo "Stop Application"
-
-# Log the current working directory
 echo "Current directory is: $(pwd)"
-
-# Log the contents of the current directory
 echo "Listing contents:"
 ls -la
 
-# Stop the application using docker-compose
-docker compose --file docker-compose.production.yml down
+# Use the absolute path to docker-compose.production.yml
+if [ -f /home/ubuntu/docker-compose.production.yml ]; then
+    echo "Found docker-compose file."
+    docker compose --file /home/ubuntu/docker-compose.production.yml down
+else
+    echo "docker-compose.production.yml not found!"
+    exit 1
+fi

@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - source: /e0-olguitab-master/docker-compose.production.yml
+  - source: /docker-compose.production.yml
     destination: /home/ubuntu/
   - source: /scripts
     destination: /home/ubuntu/scripts
