@@ -1,34 +1,32 @@
+version: '3.8'
 services:
   app1:
-    build: ./src
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app1-latest
     ports:
       - "3001:3000"
-    networks:
-      - app-network
     environment:
       - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
+    networks:
+      - app-network
 
   app2:
-    build: ./src
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app2-latest
     ports:
       - "3002:3000"
-    networks:
-      - app-network
     environment:
       - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
+    networks:
+      - app-network
 
   mqtt-service:
-    build: ./mqtt-service
-    depends_on:
-      - db
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:mqtt-service-latest
+    ports:
+      - "1884:1884"
     environment:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
       - MQTT_PASSWORD=iic2173-2024-2-students
-      #- APP_URL=http://app1:3001  # Cambia esto a app1 o app2 según el servicio que desees
-      - APP_URL=http://app1
-    ports:
-      - "1884:1884"
+      - APP_URL=http://app1:3000
     networks:
       - app-network
 
@@ -38,9 +36,6 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-    networks:
-      - app-network
-
 
 networks:
   app-network:
@@ -48,4 +43,3 @@ networks:
 
 volumes:
   mongo-data:
-

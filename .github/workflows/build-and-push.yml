@@ -1,0 +1,68 @@
+name: Build and Push to ECR
+
+on:
+  push:
+    branches:
+      # - main
+      - CI-CD-integraction
+
+permissions:
+  id-token: write
+  contents: read  
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID0 }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY0 }}
+          aws-region: us-east-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+          mask-password: "true"
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY_ALIAS: v9b5f4l8
+          REPOSITORY: futbet23
+          IMAGE_TAG: latest
+        run: |
+          docker-compose -f docker-compose.production.yml build
+          docker-compose -f docker-compose.production.yml push
+
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID0 }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY0 }}
+          aws-region: us-east-2
+
+      - name: Zip artifact to deploy
+        run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml
+
+      - name: Copy Zip to S3
+        run: aws s3 cp deploy.zip s3://iic2173/deploy.zip
+
+      - name: Create CodeDeploy Deployment
+        id: create-deployment-trigger
+        run: |
+          deploymentId=$(aws deploy create-deployment --application-name IIC2173-CD-Ayudantia --deployment-group-name IIC2173-Group --region us-east-2 --s3-location bucket=iic2173,key=deploy.zip,bundleType=zip --description "Automatic deployment from githubactions commit ${{ github.sha }}" | jq -r '.deploymentId')
+          echo "DeploymentId=$deploymentId" >> $GITHUB_OUTPUT
+
+      - name: Wait for deployment to finish
+        run: aws deploy wait deployment-successful --deployment-id ${{ steps.create-deployment-trigger.outputs.deploymentId }} --region us-east-2
