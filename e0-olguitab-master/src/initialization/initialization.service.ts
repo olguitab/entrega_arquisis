@@ -20,7 +20,7 @@ export class InitializationService implements OnModuleInit {
 
   async cleanFixtures() {
     try {
-      await this.transactionModel.deleteMany({}); // Esto elimina todos los documentos en la colección Fixtures
+      // await this.transactionModel.deleteMany({}); // Esto elimina todos los documentos en la colección Fixtures
       //console.log('Todos los datos de Fixtures han sido eliminados.');
       console.log('Ya no se eliminan datos 2.');
     } catch (error) {

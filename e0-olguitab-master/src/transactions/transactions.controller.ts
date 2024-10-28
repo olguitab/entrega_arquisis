@@ -20,7 +20,7 @@ export class TransactionController {
 
     @Post('commit')
     async commit(@Body() body: { token_ws: string; transactionId: string }) {
-        console.log(body.transactionId)
+        console.log('transaction:', body.transactionId)
         return this.transactionService.commitTransaction(body.token_ws, body.transactionId);
     }
 
