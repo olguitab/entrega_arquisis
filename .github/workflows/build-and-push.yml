@@ -52,7 +52,7 @@ jobs:
   deploy-to-ec2:
     runs-on: ubuntu-latest
     if: ${{always()}}
-    # Tiene el requisito de que el job de antes funcione
+    # Tiene el requisito de que el job de antes funcione, agregar otros si hay tiempo
     needs: [build-and-push]
     steps:
       - name: Checkout code
