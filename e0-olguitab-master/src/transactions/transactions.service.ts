@@ -50,6 +50,35 @@ export class TransactionService {
         return { url, savedTransaction };
     }
 
+    async commitTransaction(token_ws: string, transactionId: string): Promise<Transaction> {
+        // 1. Buscar la transacción por ID
+        const transaction = await this.transactionModel.findById(transactionId);
+        if (!transaction) {
+            throw new NotFoundException('Transaction not found');
+        }
+
+        // 2. Hacer la llamada al servicio de WebPay para el commit
+        try {
+            //const response = await axios.post('https://api.webpay.cl/commit', {
+            //    token_ws,
+            const response = await this.webpayService.commitTransaction(token_ws);
+            console.log("response:", response);
+
+            // 3. Verificar la respuesta y actualizar el estado y el token
+            if (response.data && response.data.token) {
+                transaction.status = response.data.status; // Asegúrate de que el campo existe
+                transaction.token = response.data.token; // Actualiza el token si es necesario
+                await transaction.save(); // Guardar los cambios en la base de datos
+            } else {
+                console.log('Error on WebPay response');
+            }
+        } catch (error) {
+            console.log('Could not commit with WebPay:', error);
+        }
+
+        return transaction;
+    }
+
     // Obtener todas las transacciones
     async findAll(): Promise<Transaction[]> {
         return this.transactionModel

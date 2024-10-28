@@ -18,6 +18,12 @@ export class TransactionController {
         return this.transactionService.findAll();
     }
 
+    @Post('commit')
+    async commit(@Body() body: { token_ws: string; transactionId: string }) {
+        console.log(body.transactionId)
+        return this.transactionService.commitTransaction(body.token_ws, body.transactionId);
+    }
+
     // // Obtener una transacción por ID
     // @Get(':id')
     // async findOne(@Param('id') id: string) {
