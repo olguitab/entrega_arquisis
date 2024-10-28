@@ -61,7 +61,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Zip artifact to deploy
-        run: zip -r deploy.zip scripts/ appspec.yml e0-olguitab-master/docker-compose.production.yml
+        run: zip -r deploy.zip ./scripts/ ./appspec.yml ./e0-olguitab-master/docker-compose.production.yml
 
       - name: Copy Zip to S3
         run: aws s3 cp deploy.zip s3://arquisis-back/deploy.zip
