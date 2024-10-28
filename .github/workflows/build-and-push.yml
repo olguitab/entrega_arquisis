@@ -29,11 +29,9 @@ jobs:
 
 
       - name: Login to Amazon ECR Public
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
-          mask-password: "true"
+        run: |
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin public.ecr.aws
+
 
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
