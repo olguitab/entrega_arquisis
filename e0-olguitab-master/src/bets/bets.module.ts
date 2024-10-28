@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BetSchema } from './bet.schema';
 import { BetService } from './bets.service';
 import { BetController } from './bets.controller';
-import { PreValidateBetModule } from './pre-validate-bet/pre-validate-bet.module';
 import { MqttModule } from '../mqtt/mqtt.module';
 import { AvailableBondsByFixtureModule } from '../available-bonds/available-bonds-by-fixture.module';
 import { WalletModule } from 'wallet/wallet.module';
