@@ -160,6 +160,7 @@ app.post('/publish', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
+  console.log('BORRAR ESTA LINEA')
   console.log(`MQTT Service listening on port ${PORT}`);
 });
 
@@ -198,4 +199,3 @@ app.listen(PORT, () => {
 
 //fetchAndPublish();
 
-// probando el publish
