@@ -2,7 +2,7 @@ services:
   app1:
     build:
       context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app1
-    image: 205930608606.dkr.ecr.us-east-1.amazonaws.com/futbet23:app1
+    image: public.ecr.aws/h5y6i3a7/futbet23:app1
     ports:
       - "3001:3000"
     networks:
@@ -13,7 +13,7 @@ services:
   app2:
     build:
       context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app2
-    image: 205930608606.dkr.ecr.us-east-1.amazonaws.com/futbet23:app2
+    image: public.ecr.aws/h5y6i3a7/futbet23:app2
     ports:
       - "3002:3000"
     networks:
@@ -24,7 +24,7 @@ services:
   mqtt-service:
     build:
       context: ./mqtt-service  # Asegúrate de que este sea el directorio donde está tu Dockerfile para mqtt-service
-    image: 205930608606.dkr.ecr.us-east-1.amazonaws.com/futbet23:mqtt-service
+    image: public.ecr.aws/h5y6i3a7/futbet23:mqtt-service
     depends_on:
       - db
     environment:
