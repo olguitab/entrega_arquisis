@@ -22,9 +22,9 @@ jobs:
         with:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID0}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY0}}
-          aws-region: us-east-1
+          aws-region: us-east-2
 
-      - name: Login to Amazon ECR Public
+      - name: Login to Amazon ECR
         id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v2
         with:
