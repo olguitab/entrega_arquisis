@@ -3,8 +3,8 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      # - main
-      - CI-CD-integration
+      - main
+      # - CI-CD-integration
 
 permissions:
   id-token: write
