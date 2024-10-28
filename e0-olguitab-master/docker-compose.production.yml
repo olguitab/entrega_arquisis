@@ -1,31 +1,41 @@
+version: '3.8'
+
 services:
   app1:
-    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app1
+    build:
+      context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app1
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app1-latest
     ports:
       - "3001:3000"
-    environment:
-      - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
     networks:
       - app-network
+    environment:
+      - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
 
   app2:
-    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app2  # Asegúrate de que esta imagen exista
+    build:
+      context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app2
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:app2-latest
     ports:
       - "3002:3000"
-    environment:
-      - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
     networks:
       - app-network
+    environment:
+      - MONGO_URI=mongodb+srv://olguitabarriga:olguita@e0.mlkrg.mongodb.net/?retryWrites=true&w=majority&appName=e0
 
   mqtt-service:
-    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:mqtt-service  # Asegúrate de que esta imagen exista
-    ports:
-      - "1884:1884"
+    build:
+      context: ./mqtt-service  # Asegúrate de que este sea el directorio donde está tu Dockerfile para mqtt-service
+    image: 205930608606.dkr.ecr.us-east-2.amazonaws.com/futbet23:mqtt-service-latest
+    depends_on:
+      - db
     environment:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
       - MQTT_PASSWORD=iic2173-2024-2-students
-      - APP_URL=http://app1:3000
+      - APP_URL=http://app1
+    ports:
+      - "1884:1884"
     networks:
       - app-network
 
@@ -35,7 +45,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-
+    networks:
+      - app-network
 
 networks:
   app-network:
