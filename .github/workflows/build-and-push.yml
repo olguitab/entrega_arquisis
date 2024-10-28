@@ -58,18 +58,18 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID0 }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY0 }}
-          aws-region: us-east-2
+          aws-region: us-east-1
 
       - name: Zip artifact to deploy
-        run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml
+        run: zip -r deploy.zip scripts/ appspec.yml e0-olguitab-master/docker-compose.production.yml
 
       - name: Copy Zip to S3
-        run: aws s3 cp deploy.zip s3://iic2173/deploy.zip
+        run: aws s3 cp deploy.zip s3://arquisis-back/deploy.zip
 
       - name: Create CodeDeploy Deployment
         id: create-deployment-trigger
         run: |
-          deploymentId=$(aws deploy create-deployment --application-name IIC2173-CD-Ayudantia --deployment-group-name IIC2173-Group --region us-east-2 --s3-location bucket=iic2173,key=deploy.zip,bundleType=zip --description "Automatic deployment from githubactions commit ${{ github.sha }}" | jq -r '.deploymentId')
+          deploymentId=$(aws deploy create-deployment --application-name futbet23-back --deployment-group-name group-futbet23-back --region us-east-2 --s3-location bucket=arquisis-back,key=deploy.zip,bundleType=zip --description "Automatic deployment from githubactions commit ${{ github.sha }}" | jq -r '.deploymentId')
           echo "DeploymentId=$deploymentId" >> $GITHUB_OUTPUT
 
       - name: Wait for deployment to finish
