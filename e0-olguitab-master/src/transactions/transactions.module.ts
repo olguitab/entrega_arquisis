@@ -5,6 +5,7 @@ import { TransactionController } from './transactions.controller';
 import { Transaction, TransactionSchema } from './transactions.schema';
 import { Request, RequestSchema } from '../requests/requests.schema'; // Asegúrate de importar el esquema Request
 import { WebpayModule } from 'webpay/webpay.module';
+import { MqttModule } from 'mqtt/mqtt.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { WebpayModule } from 'webpay/webpay.module';
         { name: Request.name, schema: RequestSchema },
         ]),
         WebpayModule,
+        MqttModule,
     ],
     controllers: [TransactionController],
     providers: [TransactionService],
