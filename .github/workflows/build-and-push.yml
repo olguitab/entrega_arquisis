@@ -42,8 +42,6 @@ jobs:
           REPOSITORY: futbet23
           IMAGE_TAG: latest
         run: |
-          # Cambia a la carpeta que contiene tu docker-compose
-          cd e0-olguitab-master
           # Construye las imágenes
           docker compose -f docker-compose.production.yml build
           # Etiqueta y empuja las imágenes
