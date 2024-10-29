@@ -16,19 +16,27 @@ import { AvailableBondsByFixtureSchema } from 'available-bonds/available-bonds-b
 import { RequestModule } from 'requests/requests.module';
 import { AppController } from 'app.controller';
 import { AppService } from 'app.service';
+import { WebpayModule } from 'webpay/webpay.module';
+import { TransactionModule } from 'transactions/transactions.module'
+import { TransactionSchema } from 'transactions/transactions.schema'
+
+
 
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI),
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
-    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),  
+    MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
+    MongooseModule.forFeature([{ name: 'Transaction', schema: TransactionSchema }]),
     UsersModule,
     BetModule,
     FixturesModule,
     WalletModule,
     RequestModule,  
+    WebpayModule,
+    TransactionModule,
   ],
   controllers: [FixturesController, AppController ],
   providers: [FixtureService, InitializationService, AppService],

@@ -11,7 +11,6 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      // console.log(' body:', requestBody);
       const { message } = requestBody;
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format:', requestBody);
@@ -21,10 +20,8 @@ export class FixturesController {
         };
       }
       const fixtures = message.fixtures;
-      //console.log('Processing fixtures:', fixtures);
 
       const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-      //console.log('Saved fixtures:', savedFixtures);
 
       return {
         statusCode: HttpStatus.CREATED,

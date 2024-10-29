@@ -7,11 +7,14 @@ import { Bet } from './bet.schema';
 import { getLocationFromIP } from './location'; // Asegúrate de que la ruta de importación sea correcta
 import { WalletService } from 'wallet/wallet.service';
 import { NotFoundException } from '@nestjs/common';
+import { TransactionService } from 'transactions/transactions.service';  // Asegúrate de tener acceso al servicio de transacciones
 
 
 @Controller('api/bet')
 export class BetController {
-  constructor(private readonly betService: BetService, private readonly walletService: WalletService ) {}
+  constructor(private readonly betService: BetService, 
+              private readonly walletService: WalletService,
+              private readonly transactionService: TransactionService) {}
 
   @Get(':userId')
   async getRecommendations(@Param('userId') userId: string) {
@@ -66,8 +69,12 @@ export class BetController {
     }
     
     const createdBet = await this.betService.createbet(createBetDto);
+
+    /* Esto debe estar directamente en wallet
     const moneySpent = createdBet.quantity * 1000;
     this.walletService.updateWalletBalance(createdBet.id_usuario, -moneySpent); 
+    */
+    // await this.transactionService.checkBetCreation(createdBet);
     return createdBet;
   }
 }

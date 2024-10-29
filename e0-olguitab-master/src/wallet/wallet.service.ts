@@ -50,6 +50,7 @@ export class WalletService {
     );
   
     if (!wallet) {
+      console.log("Wallet not found")
       throw new Error('Wallet not found');
     }
   

@@ -4,12 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Fixture } from 'fixtures/fixtures.schema'; // Asegúrate de importar tu esquema de Fixture correctamente
 import { Bet } from 'bets/bet.schema';
+import { Transaction } from 'transactions/transactions.schema' 
 
 @Injectable()
 export class InitializationService implements OnModuleInit {
   constructor(
     @InjectModel("Fixture") private fixtureModel: Model<Fixture>,
     @InjectModel('Bet') private betModel: Model<Bet>,
+    @InjectModel('Transaction') private transactionModel: Model<Transaction>,
   ) {}
 
   async onModuleInit() {
@@ -18,7 +20,7 @@ export class InitializationService implements OnModuleInit {
 
   async cleanFixtures() {
     try {
-      //await this.fixtureModel.deleteMany({}); // Esto elimina todos los documentos en la colección Fixtures
+      // await this.transactionModel.deleteMany({}); // Esto elimina todos los documentos en la colección Fixtures
       //console.log('Todos los datos de Fixtures han sido eliminados.');
       console.log('Ya no se eliminan datos 2.');
     } catch (error) {

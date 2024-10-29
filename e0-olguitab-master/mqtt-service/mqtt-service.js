@@ -54,10 +54,6 @@ client.on('connect', () => {
 client.on('message', async (topic, message) => {
 
   //  -- fixtures/validation --
-  // Si es false y es de nuestro grupo debemos devolver la plata
-  // Si es de nuestro grupo debemos cambiar el estado de la bet/bond
-  // en resumen: update a wallet si es de nuestro grupo y false
-  //             & update de estado del bono
   if (topic === 'fixtures/validation') {
     try {
       const data = JSON.parse(message.toString());
@@ -65,8 +61,6 @@ client.on('message', async (topic, message) => {
       console.log('Validation message:\n', message.toString());
 
       const response = await axios.post(`${process.env.APP_URL}/requests/validation`, data);
-    
-
     } catch (error) {
       console.error('Error processing MQTT message VALIDATION:', error);
     }
@@ -120,7 +114,7 @@ client.on('message', async (topic, message) => {
 
 
 // ----- PUBLISHING: POSTING ON REQUESTS -----
-app.post('/publish', (req, res) => {
+app.post('/publish/requests', (req, res) => {
   const { message } = req.body;
   console.log("Publishing on requests channel, triggered by a bond creation ")
   client.publish('fixtures/requests', message, (err) => {
@@ -133,43 +127,22 @@ app.post('/publish', (req, res) => {
   });
 });
 
+// ----- PUBLISHING: POSTING ON VALIDATION -----
+app.post('/publish/validation', (req, res) => {
+  const { message } = req.body;
+  console.log("Publishing on validation channel, triggered by transaction commit")
+  client.publish('fixtures/validation', message, (err) => {
+    if (err) {
+      console.error('Error publishing on MQTT', err);
+      return res.status(500).json({ message: 'Error publishing on MQTT' });
+    }
+    console.log(`Message published on validation:': ${message}`);
+    return res.status(200).json({ message: 'Published successfully on MQTT' });
+  });
+});
+
 const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`MQTT Service listening on port ${PORT}`);
 });
-
-// async function fetchAndPublish() {
-//   try {
-//     // Primero, realiza una solicitud GET para obtener la información necesaria
-//     const getInfoResponse = await axios.get(`${process.env.APP_URL}/pre-validate-bet`);
-//     console.log('Información obtenida con éxito:', getInfoResponse.data);
-
-//     // Verifica si getInfoResponse.data contiene algún elemento
-//     if (getInfoResponse.data.length > 0) {
-//       // Selecciona el primer objeto del array
-//       const firstObject = getInfoResponse.data[0];
-//       // Convierte el primer objeto a un string JSON
-//       const messageString = JSON.stringify(firstObject);
-
-//       // Publica el mensaje a MQTT y luego realiza la solicitud POST
-//       client.publish('fixtures/requests', messageString, {}, async (err) => {
-//         if (err) {
-//           console.error('Error publishing message:', err);
-//         } else {
-//           console.log('Message published to fixtures/requests');
-//           console.log('Bet placed successfully:', messageString);
-//         }
-//       });
-//     } else {
-//       console.log('No hay datos para enviar.');
-//     }
-    
-//     setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de ejecutar de nuevo
-//   } catch (getError) {
-//     console.error('Error obteniendo información:', getError);
-//     setTimeout(fetchAndPublish, 120000); // Espera 2 minutos antes de intentar de nuevo
-//   }
-// }
-
-//fetchAndPublish();
 
