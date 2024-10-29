@@ -14,6 +14,8 @@ import { AvailableBondsByFixtureSchema } from 'available-bonds/available-bonds-b
 
 
 import { RequestModule } from 'requests/requests.module';
+import { AppController } from 'app.controller';
+import { AppService } from 'app.service';
 
 
 @Module({
@@ -28,7 +30,8 @@ import { RequestModule } from 'requests/requests.module';
     WalletModule,
     RequestModule,  
   ],
-  controllers: [FixturesController],
-  providers: [FixtureService, InitializationService],
+  controllers: [FixturesController, AppController ],
+  providers: [FixtureService, InitializationService, AppService],
 })
 export class AppModule {}
+
