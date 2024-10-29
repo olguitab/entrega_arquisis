@@ -69,7 +69,8 @@ client.on('message', async (topic, message) => {
   } else if (topic === 'fixtures/info') {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
-      console.log('Received message, sending to app...');
+      console.log('Received fixtures/info message, sending to app...');
+      // console.log('Info message:\n', message.toString());
       await axios.post(`${process.env.APP_URL}/fixtures/process`, {
         topic,
         message: parsedMessage,
@@ -84,11 +85,11 @@ client.on('message', async (topic, message) => {
       console.log('Received message on fixtures/request, sending to app...');
       console.log('Received request string JSON:', JSON.parse(message.toString()));
 
-      const fixtureId = parsedMessage.fixture_id;
-      const quantity = parsedMessage.quantity;
-      console.log(`Fixture id associated to bond request: ${fixtureId}`);
-      
-      await axios.post(`${process.env.APP_URL}/available-bonds/${fixtureId}/decrement/${quantity}`);
+      // se está procesando acá dentro del process request el decremento de los bonos
+      await axios.post(`${process.env.APP_URL}/requests/process`, {
+        topic,
+        message: parsedMessage,
+      });
     } catch (error) {
       console.error('Error processing MQTT message REQUEST:', error);
     }
@@ -99,7 +100,7 @@ client.on('message', async (topic, message) => {
     try {
       const parsedMessage = JSON.parse(JSON.parse(message.toString()));
       console.log('Received message on fixtures/history, sending to app...');
-      console.log('History message:\n', message.toString());
+      // console.log('History message:\n', message.toString());
 
       await axios.patch(`${process.env.APP_URL}/fixtures/history`, {
         topic,
@@ -140,7 +141,7 @@ app.post('/publish/validation', (req, res) => {
   });
 });
 
-const PORT = 3000;
+const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`MQTT Service listening on port ${PORT}`);
 });

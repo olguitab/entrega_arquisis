@@ -6,6 +6,7 @@ import { CreateBetDto } from './create-bet.dto';
 import { Bet } from './bet.schema';
 import { getLocationFromIP } from './location'; // Asegúrate de que la ruta de importación sea correcta
 import { WalletService } from 'wallet/wallet.service';
+import { NotFoundException } from '@nestjs/common';
 import { TransactionService } from 'transactions/transactions.service';  // Asegúrate de tener acceso al servicio de transacciones
 
 
@@ -15,11 +16,27 @@ export class BetController {
               private readonly walletService: WalletService,
               private readonly transactionService: TransactionService) {}
 
+  @Get(':userId')
+  async getRecommendations(@Param('userId') userId: string) {
+    if (!userId) {
+      throw new NotFoundException('User ID is required');
+    }
+    return this.betService.getRecommendations(userId);
+  }
+
   @Get('history/:userId') // Define la ruta para aceptar un userId como parámetro
   async findHistoryByUserId(@Param('userId') userId: string): Promise<Bet[]> {
     return this.betService.findBetsByUserId(userId);
   }
 
+  
+  @Get('/job/:jobId')
+  async getjob(@Param('obId') obId: string) {
+    if (!obId) {
+      throw new NotFoundException('User ID is required');
+    }
+    return this.betService.getjob(obId);
+  }
   @Get() 
   findAll(): Promise<Bet[]> { 
     return this.betService.findAll(); 

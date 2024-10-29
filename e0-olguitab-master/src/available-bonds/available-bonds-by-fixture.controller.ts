@@ -25,7 +25,9 @@ export class AvailableBondsByFixtureController {
     async decrementAvailableBondsByFixture(
         @Param('fixtureId') fixtureId: number,
         @Param('quantity') quantity: number
-        ) {
+        ) 
+        {
+        console.log('Recibiendo request en available bonds de fixtureId:', fixtureId);
         try {
             const result = await this.availableBondsByFixtureService.decrementAvailableBonds(fixtureId, Number(quantity));
         if (!result) {

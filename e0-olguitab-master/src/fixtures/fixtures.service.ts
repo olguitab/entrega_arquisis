@@ -26,11 +26,11 @@ export class FixtureService {
         );
 
         // Revisar si ya existe el AvailableBonds
-        console.log(`Checking if the fixture with id ${updatedFixture.fixture.id} has an AvailableBond associated`)
+        // console.log(`Checking if the fixture with id ${updatedFixture.fixture.id} has an AvailableBond associated`)
         const existingAvailableBond = await this.availableBondsByFixtureModel.findOne({
           fixtureId: updatedFixture.fixture.id,
         });
-        console.log(`Result: ${existingAvailableBond}`)
+        // console.log(`Result: ${existingAvailableBond}`)
         // Si no existe, crear el AvailableBonds asociado al fixture
         if (!existingAvailableBond) {
           console.log("Creating an AvailableBond");
@@ -97,7 +97,7 @@ export class FixtureService {
   
   async processHistoryFixtures(fixturesData: any[]): Promise<any[]> {
     // esta función va a actualizar las fixtures existentes cambiando sus datoss
-    console.log('Fixtures a actualizar:', fixturesData);
+    // console.log('Fixtures a actualizar:', fixturesData);
     if (!fixturesData) {
       throw new Error('fixtureData is null or undefined');
     
@@ -107,8 +107,8 @@ export class FixtureService {
       throw new Error('fixturesData is not an array');
     }
 
-    console.log('Primer elemento:', fixturesData[0]);
-    console.log('Fixture', fixturesData[0].fixture);
+    // console.log('Primer elemento:', fixturesData[0]);
+    // console.log('Fixture', fixturesData[0].fixture);
     const updatedFixtures = await Promise.all(
         fixturesData.map((fixtureData) => {
           
@@ -129,7 +129,7 @@ export class FixtureService {
       // revisar que esté bien que sea FT
       .map(fixture => fixture.fixture.id);
 
-    console.log('Fixture IDs in process history map before checking bets:', fixtureIds);
+    // console.log('Fixture IDs in process history map before checking bets:', fixtureIds);
 
   
     // TO DO: refactorizar a bets.service, primero ver que funcione bien
@@ -161,44 +161,41 @@ export class FixtureService {
       }
       if (homeGoals > awayGoals) {
         winner = homeTeam;
-        //odd = fixture.odds[0].values[0].odd;
         odd = odds[0].odd;
       } else if (awayGoals > homeGoals) {
         winner = awayTeam;
-        //odd = fixture.odds[0].values[2].odd;
         odd = odds[2].odd;
       } else if (homeGoals === awayGoals) {
         winner = '---';
-        //odd = fixture.odds[0].values[1].odd;
         odd = odds[1].odd;
       }
       else {
         winner = null;
       }
       // imprimir ganador e id del partido
-      console.log('Fixture ID:', fixtureId);
-      console.log('Home Team:', homeTeam);
-      console.log('Away Team:', awayTeam);
-      console.log('Winner:', winner);
+      // console.log('Fixture ID:', fixtureId);
+      // console.log('Home Team:', homeTeam);
+      // console.log('Away Team:', awayTeam);
+      // console.log('Winner:', winner);
 
       const bets = await this.betService.findBetsByFixtureId(fixtureId);
-      console.log('Bets:', bets);
+      // console.log('Bets:', bets);
 
 
       for (const bet of bets) {
         if (bet.status === 'Validated') { // en los otros casos como Pending, Won, Lost, no se hace nada
           if (bet.result === winner) {
             // que cambie el status a Won y se le añada el dinero a su wallet
-            console.log('Bet ganado:', bet);
-            console.log('Ganador:', winner);
+            // console.log('Bet ganado:', bet);
+            // console.log('Ganador:', winner);
             await this.betService.updateBetStatus(bet.request_id, 'Won');
             const moneyWon = bet.quantity * 1000 * odd;
             await this.walletService.updateWalletBalance(bet.id_usuario, moneyWon);
 
           } else {
             // cambio de estado a Lost y nada más
-            console.log('Bet perdido:', bet);
-            console.log('Ganador:', winner);
+            // console.log('Bet perdido:', bet);
+            // console.log('Ganador:', winner);
             await this.betService.updateBetStatus(bet.request_id, 'Lost');
           }
         }

@@ -8,11 +8,14 @@ import { RequestsController } from './requests.controller';
 import { BetModule } from 'bets/bets.module';
 import { OtherBetsModule } from 'bets/other-bets/other-bets.module';
 
+import { AvailableBondsByFixtureModule } from 'available-bonds/available-bonds-by-fixture.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Request', schema: RequestSchema }]),
     BetModule,
     OtherBetsModule,
+    AvailableBondsByFixtureModule,
   ],
   providers: [RequestsService],
   controllers: [RequestsController],

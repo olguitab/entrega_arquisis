@@ -9,14 +9,13 @@ import { BetModule } from 'bets/bets.module';
 import { BetSchema } from 'bets/bet.schema';
 
 import { FixturesModule } from 'fixtures/fixtures.module';
-import { PreValidateBetModule } from 'bets/pre-validate-bet/pre-validate-bet.module';
-import { ValidateBetModule } from 'bets/validate-bet/validate-bet.module';
 import { WalletModule } from 'wallet/wallet.module';
 import { AvailableBondsByFixtureSchema } from 'available-bonds/available-bonds-by-fixture.schema';
 
 
-import { ValidateBetController } from 'bets/validate-bet/validate-bet.controller';
 import { RequestModule } from 'requests/requests.module';
+import { AppController } from 'app.controller';
+import { AppService } from 'app.service';
 import { WebpayModule } from 'webpay/webpay.module';
 import { TransactionModule } from 'transactions/transactions.module'
 import { TransactionSchema } from 'transactions/transactions.schema'
@@ -34,14 +33,13 @@ import { TransactionSchema } from 'transactions/transactions.schema'
     UsersModule,
     BetModule,
     FixturesModule,
-    PreValidateBetModule,
-    ValidateBetModule,
     WalletModule,
     RequestModule,  
     WebpayModule,
     TransactionModule,
   ],
-  controllers: [FixturesController],
-  providers: [FixtureService, InitializationService],
+  controllers: [FixturesController, AppController ],
+  providers: [FixtureService, InitializationService, AppService],
 })
 export class AppModule {}
+

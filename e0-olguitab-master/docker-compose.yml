@@ -25,10 +25,12 @@ services:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
       - MQTT_PASSWORD=iic2173-2024-2-students
-      #- APP_URL=http://app1:3001  # Cambia esto a app1 o app2 según el servicio que desees
-      - APP_URL=http://app1
+      - APP_URL=http://app1:3000  # o app2:3000, se tiene que usar el puerto de la app que se quiere usar, el puerto 3000 es el que escucha, expone el 3001/3002 
+      # si no se asigna se asume 80 por defecto y produce errores
+
     ports:
-      - "1884:1884"
+      - "1884:1884" # mqtt
+      - "3003:3003" # mini api express para el publish
     networks:
       - app-network
 
@@ -41,6 +43,92 @@ services:
     networks:
       - app-network
 
+  redis-broker:
+    image: redis:7
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - app-network
+
+  # JobMaster (FastAPI)
+  producer:
+    build: 
+      context: ./workers
+      # dockerfile: Dockerfile
+    command: uvicorn producer:app --reload --host 0.0.0.0 --port 8000
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
+      - CELERY_BROKER_URL=redis://redis-broker:6379/0  
+      - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
+      # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+
+  # Workers (Celery)
+  consumer:
+    build:
+      context: ./workers
+      # dockerfile: Dockerfile
+
+    # el comentado es la ayudantía pero se caían los contenedores
+    command: celery -A consumer.celery_app worker --loglevel=INFO --purge --concurrency=1
+    #command: celery -A consumer worker --loglevel=INFO --purge --concurrency=1
+
+    deploy:
+      replicas: 2 
+    volumes:
+      - ./workers:/opt/
+    networks:
+      - app-network
+    depends_on:
+      - redis-broker
+    environment:
+      # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
+      - CELERY_BROKER_URL=redis://redis-broker:6379/0  
+      - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
+      # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+
+  # Dashboard de Celery (Flower)
+  # dashboard:
+  #   build:
+  #     context: ./workers
+  #     dockerfile: Dockerfile
+  #   command: bash -c "sleep 10; celery -A consumer.celery_app flower --loglevel=INFO --url_prefix=dashboard;"
+  #   ports:
+  #     - "5555:5555"
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - consumer
+  #     # - celery_beat
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  #     # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+  #     - CELERY_BROKER_URL=redis://redis-broker:6379/0  
+  #     - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
+
+  # celery_beat:
+  #   build:
+  #     context: ./workers
+  #     dockerfile: Dockerfile
+  #   command: celery -A consumer.celery_app beat --loglevel=INFO
+  #   volumes:
+  #     - ./workers:/opt/
+  #   depends_on:
+  #     - producer
+  #   environment:
+  #     CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  #     CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
 
 networks:
   app-network:
@@ -48,4 +136,3 @@ networks:
 
 volumes:
   mongo-data:
-

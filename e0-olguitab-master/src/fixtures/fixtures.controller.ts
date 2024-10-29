@@ -85,8 +85,8 @@ export class FixturesController {
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
       const { message } = requestBody;
-      console.log('Enter patch for history');
-      console.log('Received message:', message);
+      // console.log('Enter patch for history');
+      // console.log('Received message:', message);
     
   
       // Usar la función de validación
