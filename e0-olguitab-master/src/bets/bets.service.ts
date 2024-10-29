@@ -7,6 +7,9 @@ import { NotFoundException } from '@nestjs/common';
 import { MqttService } from '../mqtt/mqtt.service';
 import { AvailableBondsByFixtureService } from '../available-bonds/available-bonds-by-fixture.service';
 import { WalletService } from '../wallet/wallet.service';
+import axios from 'axios'; // Importa Axios aquí
+
+
 
 
 @Injectable()
@@ -14,10 +17,19 @@ export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
   private readonly mqttService: MqttService,
   private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
-  private readonly walletService: WalletService
+  private readonly walletService: WalletService,
+
 
 ) {}
-
+async getRecommendations(userId: string) {
+  try {
+    const response = await axios.post(`http://host.docker.internal:8000/job`, { user_id: userId });
+    return response.data; // Maneja la respuesta según tu necesidad
+  } catch (error) {
+    console.error('Error al obtener recomendaciones:', error);
+    throw error; // O maneja el error de otra manera
+  }
+}
   async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ id_usuario: userId }).exec();
   }
