@@ -20,7 +20,7 @@ export class TransactionService {
         const walletId = transactionData.walletId;
         const betId = transactionData.betId;
         const sessionId = walletId || betId;
-        const returnUrl = `http://localhost:4000/successful-purchase`;
+        const returnUrl = `https://web.e0arquivaldes.me/successful-purchase`;
         const amount = transactionData.amount;
 
         const response = await this.webpayService.createTransaction(amount, sessionId, returnUrl);
