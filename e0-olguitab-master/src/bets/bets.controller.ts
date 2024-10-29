@@ -26,6 +26,14 @@ export class BetController {
     return this.betService.findBetsByUserId(userId);
   }
 
+  
+  @Get('/job/:jobId')
+  async getjob(@Param('obId') obId: string) {
+    if (!obId) {
+      throw new NotFoundException('User ID is required');
+    }
+    return this.betService.getjob(obId);
+  }
   @Get() 
   findAll(): Promise<Bet[]> { 
     return this.betService.findAll(); 
