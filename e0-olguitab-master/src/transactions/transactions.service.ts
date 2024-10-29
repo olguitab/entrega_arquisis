@@ -52,10 +52,12 @@ export class TransactionService {
 
         try {
             const response = await this.webpayService.commitTransaction(token_ws);
+            console.log('response_code', response.response_code);
+            console.log('response.status', response.status);
             if (response.status) {
                 transaction.status = response.status; 
                 transaction.token = token_ws;
-                const valid = response.status === "AUTHORIZED";
+                const valid = response.response_code === 0;
                 
                 const message = {
                     request_id: transaction.betId,
@@ -63,7 +65,6 @@ export class TransactionService {
                     seller: 0,
                     valid: valid,
                 };
-                
                 
                 await this.mqttService.publishToMqttValidation(JSON.stringify(message));
 
