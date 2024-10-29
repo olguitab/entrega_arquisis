@@ -20,7 +20,7 @@ export class TransactionService {
         const walletId = transactionData.walletId;
         const betId = transactionData.betId;
         const sessionId = walletId || betId;
-        const returnUrl = `http://localhost:4000/successful-purchase`;
+        const returnUrl = `${process.env.APP_URL}/successful-purchase`;
         const amount = transactionData.amount;
 
         const response = await this.webpayService.createTransaction(amount, sessionId, returnUrl);
@@ -51,11 +51,25 @@ export class TransactionService {
         }
 
         try {
+
             const response = await this.webpayService.commitTransaction(token_ws);
             console.log('response_code', response.response_code);
             console.log('response.status', response.status);
+
+            let status: string;
+            if (response.response_code === 0){
+                status = 'AUTHORIZED';
+            }
+            else if (response.response_code === -1){
+                status = 'CANCELED';
+            }
+            else {
+                status = 'FAILED';
+            }
+
             if (response.status) {
-                transaction.status = response.status; 
+                
+                transaction.status = status; 
                 transaction.token = token_ws;
                 const valid = response.response_code === 0;
                 
