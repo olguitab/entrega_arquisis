@@ -1,24 +1,9 @@
-# celery
 from celery import shared_task
-from celery_config.controllers import sum_to_n
+from .recommendation_logic import generate_recommendations
+import asyncio
 
-# standard
-import time
-
-# The "shared_task" decorator allows creation
-# of Celery tasks for reusable apps as it doesn't
-# need the instance of the Celery app.
-# @celery_app.task()
-@shared_task()
-def add(x, y):
-    return x + y
-
+# Tareas de Celery
 @shared_task
-def wait_and_return():
-    time.sleep(20)
-    return 'Hello World!'
-
-@shared_task
-def sum_to_n_job(number):
-    result = sum_to_n(number)
-    return result
+def generate_recommendations_task(user_id):
+    recommendations = asyncio.run(generate_recommendations(user_id))
+    return recommendations
