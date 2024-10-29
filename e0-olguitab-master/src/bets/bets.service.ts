@@ -30,6 +30,15 @@ async getRecommendations(userId: string) {
     throw error; // O maneja el error de otra manera
   }
 }
+  async getjob(obId: string) {
+  try {
+    const response = await axios.get(`http://host.docker.internal:8000/job/${obId}`);
+    return response.data; // Maneja la respuesta según tu necesidad
+  } catch (error) {
+    console.error('Error al obtener recomendaciones:', error);
+    throw error; // O maneja el error de otra manera
+  }
+}
   async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ id_usuario: userId }).exec();
   }
