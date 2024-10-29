@@ -1,49 +1,32 @@
-import os
-from fastapi import FastAPI
-# celery
-from celery_config.tasks import wait_and_return, sum_to_n_job
-from models import Number
+from fastapi import FastAPI, HTTPException, Body
+from pydantic import BaseModel
+from celery.result import AsyncResult
+from celery_config.tasks import generate_recommendations_task  # Asegúrate de que este import esté correcto
 
-
-# este es el producer (job master), que debe recibir las requests desde mi API principal
-# y publicar los jobs en la cola de celery, que asigna los jobs a los workers
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello World, this is a route from the producer or job master"}
+class JobRequest(BaseModel):
+    user_id: str
 
-# https://docs.celeryq.dev/en/stable/getting-started/first-steps-with-celery.html
-@app.get("/wait_and_return")
-def get_publish_job():
-    job = wait_and_return.delay()
-    return {
-        "message": "job published",
-        "job_id": job.id,
-    }
+@app.post("/job")
+async def create_job(request: JobRequest):
+    task = generate_recommendations_task.delay(request.user_id)  # Asegúrate de que este método está definido en tasks.py
+    return {"job_id": task.id}
 
-@app.get("/wait_and_return/{job_id}")
-def get_job(job_id: str):
-    job = wait_and_return.AsyncResult(job_id)
-    print(job)
-    return {
-        "ready": job.ready(),
-        "result": job.result,
-    }
+@app.get("/job/{job_id}")
+async def get_job_result(job_id: str):
+    result = AsyncResult(job_id)
+    
+    if result.ready():
+        if isinstance(result.result, list):
+            return {
+                "ready": True,
+                "recommendations": result.result
+            }
+        else:
+            return {
+                "ready": True,
+                "result": result.result
+            }
+    return {"ready": False}
 
-@app.post("/sum")
-def post_publish_job(number: Number):
-    job = sum_to_n_job.delay(number.number)
-    return {
-        "message": "job published",
-        "job_id": job.id,
-    }
-
-@app.get("/sum/{job_id}")
-def get_job(job_id: str):
-    job = sum_to_n_job.AsyncResult(job_id)
-    print(job)
-    return {
-        "ready": job.ready(),
-        "result": job.result,
-    }
