@@ -6,7 +6,7 @@ import { CreateBetDto } from './create-bet.dto';
 import { Bet } from './bet.schema';
 import { getLocationFromIP } from './location'; // Asegúrate de que la ruta de importación sea correcta
 import { WalletService } from 'wallet/wallet.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TransactionService } from 'transactions/transactions.service';  // Asegúrate de tener acceso al servicio de transacciones
 
 import { ApiTags } from '@nestjs/swagger';
@@ -33,13 +33,20 @@ export class BetController {
   }
 
   
-  @Get('/job/:jobId')
+  // Controlador
+  @Get('/job/:obId')
   async getjob(@Param('obId') obId: string) {
     if (!obId) {
-      throw new NotFoundException('User ID is required');
+      throw new BadRequestException('Job ID is required');
     }
-    return this.betService.getjob(obId);
+    try {
+      return await this.betService.getjob(obId);
+    } catch (error) {
+      // Captura y lanza el error original
+      throw new InternalServerErrorException(error.message || 'Error fetching job results');
+    }
   }
+
   @Get() 
   findAll(): Promise<Bet[]> { 
     return this.betService.findAll(); 
