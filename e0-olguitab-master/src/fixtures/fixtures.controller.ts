@@ -1,6 +1,9 @@
 import { Controller, Post, Body, Patch, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 import { BetService } from 'bets/bets.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('fixtures')
 
 @Controller('fixtures')
 export class FixturesController {

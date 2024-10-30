@@ -1,6 +1,10 @@
 import { Controller, Get, Post, Query, Body, Res } from '@nestjs/common';
 import { WebpayService } from './webpay.service';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('webpay')
+
 @Controller('webpay')
 export class WebpayController {
     constructor(private readonly webpayService: WebpayService) {}

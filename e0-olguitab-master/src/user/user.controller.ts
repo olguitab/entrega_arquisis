@@ -5,6 +5,9 @@ import { User } from './user.schema';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginUserDto } from './login-user.dto';
 import { AuthService } from 'auth/auth.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('users')
 
 @Controller('users')
 export class UsersController {

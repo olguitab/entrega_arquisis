@@ -2,6 +2,10 @@ import { Controller, Post, Body, Put, HttpStatus, Get, Param, Query, NotFoundExc
 import { WalletService } from './wallet.service';
 import { Types } from 'mongoose';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('wallet')
+
 @Controller('wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
