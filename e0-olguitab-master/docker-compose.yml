@@ -21,6 +21,7 @@ services:
     build: ./mqtt-service
     depends_on:
       - db
+      - app1
     environment:
       - MQTT_BROKER_URL=mqtt://broker.iic2173.org:9000
       - MQTT_USERNAME=students
