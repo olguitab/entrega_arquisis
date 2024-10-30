@@ -99,7 +99,7 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Asegúrate de que la ruta sea correcta
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Asegúratee de que la ruta sea correcta
     ports:
       - "80:80"
     networks:
