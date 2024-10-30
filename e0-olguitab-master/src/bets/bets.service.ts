@@ -25,7 +25,7 @@ export class BetService {
 async getRecommendations(userId: string) {
   try {
     const response = await axios.post(`http://3.14.1.216:8000/job`, { user_id: userId });
-    return response.data; // Maneja la respuesta según tu necesidad
+    return response.data; // Maneja la respuesta según tu necesidadd
   } catch (error) {
     console.error('Error al obtener recomendaciones:', error);
     throw error; // O maneja el error de otra manera
