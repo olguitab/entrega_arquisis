@@ -1,4 +1,13 @@
 services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Asegúrate de que la ruta al archivo de configuración sea correcta
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+      
   app1:
     build:
       context: ./src  # Asegúrate de que este sea el directorio donde está tu Dockerfile para app1
