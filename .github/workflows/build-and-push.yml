@@ -4,7 +4,7 @@ on:
   push:
     branches:
       # - main
-      - webpay-deploy
+      - workers-deploy-test
 
 permissions:
   id-token: write
