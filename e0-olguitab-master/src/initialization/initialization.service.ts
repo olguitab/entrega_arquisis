@@ -6,16 +6,20 @@ import { Fixture } from 'fixtures/fixtures.schema'; // Asegúrate de importar tu
 import { Bet } from 'bets/bet.schema';
 import { Transaction } from 'transactions/transactions.schema' 
 
+import { AvailableBondsByFixture } from 'available-bonds/available-bonds-by-fixture.schema';
+
 @Injectable()
 export class InitializationService implements OnModuleInit {
   constructor(
     @InjectModel("Fixture") private fixtureModel: Model<Fixture>,
     @InjectModel('Bet') private betModel: Model<Bet>,
     @InjectModel('Transaction') private transactionModel: Model<Transaction>,
+    @InjectModel('AvailableBondsByFixture') private availableBondsByFixtureModel: Model<AvailableBondsByFixture>
   ) {}
 
   async onModuleInit() {
-    await this.cleanFixtures();
+    //await this.cleanFixtures();
+    //await this.addAvailableBondsToFixtures();
   }
 
   async cleanFixtures() {
@@ -41,4 +45,23 @@ export class InitializationService implements OnModuleInit {
       console.error('Error al actualizar los estados de las apuestas:', error);
     }
   }
+
+  async addAvailableBondsToFixtures() {
+    try {
+      // Encuentra todos los fixtures con availableBonds
+      const fixtures = await this.availableBondsByFixtureModel.find();
+  
+      // Recorre y actualiza cada fixture
+      for (const fixture of fixtures) {
+        await this.availableBondsByFixtureModel.updateOne(
+          { _id: fixture._id },  // Usar el _id para identificar el fixture
+          { availableBonds: 20 }  // Actualiza el valor a 20
+        );
+      }
+      console.log("Todos los availableBonds fueron actualizados a 20.");
+    } catch (error) {
+      console.error("Error actualizando availableBonds en fixtures:", error);
+    }
+  }
+  
 }
