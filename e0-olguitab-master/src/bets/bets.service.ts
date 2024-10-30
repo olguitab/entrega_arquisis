@@ -31,13 +31,14 @@ async getRecommendations(userId: string) {
     throw error; // O maneja el error de otra manera
   }
 }
-  async getjob(obId: string) {
+async getjob(obId: string) {
   try {
     const response = await axios.get(`http://host.docker.internal:8000/job/${obId}`);
-    return response.data; // Maneja la respuesta según tu necesidad
+    return response.data;
   } catch (error) {
-    console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera
+    console.error('Error fetching job data:', error.response ? error.response.data : error.message);
+    // Lanza el error completo para que el controlador lo maneje
+    throw new Error(error.response ? error.response.data : 'Failed to fetch job data');
   }
 }
   async findBetsByUserId(userId: string): Promise<Bet[]> {
