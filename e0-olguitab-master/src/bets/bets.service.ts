@@ -24,7 +24,7 @@ export class BetService {
 ) {}
 async getRecommendations(userId: string) {
   try {
-    const response = await axios.post(`http://producer:8000/job`, { user_id: userId });
+    const response = await axios.post(`http://3.14.1.216:8000/job`, { user_id: userId });
     return response.data; // Maneja la respuesta según tu necesidad
   } catch (error) {
     console.error('Error al obtener recomendaciones:', error);
@@ -33,7 +33,7 @@ async getRecommendations(userId: string) {
 }
 async getjob(obId: string) {
   try {
-    const response = await axios.get(`http://producer:8000/job/${obId}`);
+    const response = await axios.get(`http://3.14.1.216:8000/job/${obId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching job data:', error.response ? error.response.data : error.message);
