@@ -7,6 +7,10 @@ import { NotFoundException } from '@nestjs/common';
 import { MqttService } from '../mqtt/mqtt.service';
 import { AvailableBondsByFixtureService } from '../available-bonds/available-bonds-by-fixture.service';
 import { WalletService } from '../wallet/wallet.service';
+import axios from 'axios'; // Importa Axios aquí
+
+
+import { TransactionService } from 'transactions/transactions.service';
 
 
 @Injectable()
@@ -14,10 +18,28 @@ export class BetService {
   constructor(@InjectModel('Bet') private betModel: Model<Bet>,
   private readonly mqttService: MqttService,
   private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
-  private readonly walletService: WalletService
+  private readonly walletService: WalletService,
+  private readonly transactionService: TransactionService
 
 ) {}
-
+async getRecommendations(userId: string) {
+  try {
+    const response = await axios.post(`http://host.docker.internal:8000/job`, { user_id: userId });
+    return response.data; // Maneja la respuesta según tu necesidad
+  } catch (error) {
+    console.error('Error al obtener recomendaciones:', error);
+    throw error; // O maneja el error de otra manera
+  }
+}
+  async getjob(obId: string) {
+  try {
+    const response = await axios.get(`http://host.docker.internal:8000/job/${obId}`);
+    return response.data; // Maneja la respuesta según tu necesidad
+  } catch (error) {
+    console.error('Error al obtener recomendaciones:', error);
+    throw error; // O maneja el error de otra manera
+  }
+}
   async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ id_usuario: userId }).exec();
   }
@@ -30,14 +52,7 @@ export class BetService {
     await createdBet.save();
 
     console.log("Creating a bet triggered by front signal")
-    // Mandar señal de post al mqtt
 
-    // si usingWallet = true es porque no usamos webpay y el broker si nos devolverá la validación
-    // al usar webpay, cambiar a false
-    const usingWallet = true;
-
-
-    // TODO: cambiar request_id por uuid
     const message = {
       request_id: createdBet.request_id,
       group_id: createdBet.group_id,
@@ -46,15 +61,15 @@ export class BetService {
       round: createdBet.round,
       date: createdBet.date,
       result: createdBet.result,
-      deposit_token: "",
+      deposit_token: createdBet.deposit_token,
       datetime: new Date().toISOString(),
       quantity: createdBet.quantity,
-      wallet: usingWallet,
+      wallet: createdBet.wallet,
       seller: 0,
 
     };
 
-    await this.mqttService.publishToMqtt(JSON.stringify(message));
+    await this.mqttService.publishToMqttRequests(JSON.stringify(message));
     return createdBet.toObject();
   }
 

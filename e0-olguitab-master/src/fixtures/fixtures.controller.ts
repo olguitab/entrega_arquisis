@@ -1,6 +1,9 @@
 import { Controller, Post, Body, Patch, HttpStatus, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { FixtureService } from './fixtures.service';
 import { BetService } from 'bets/bets.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('fixtures')
 
 @Controller('fixtures')
 export class FixturesController {
@@ -11,7 +14,6 @@ export class FixturesController {
   @Post('process')
   async processFixtures(@Body() requestBody: any): Promise<any> {
     try {
-      console.log(' body:', requestBody);
       const { message } = requestBody;
       if (!message || !Array.isArray(message.fixtures)) {
         console.log('Invalid data format:', requestBody);
@@ -21,10 +23,8 @@ export class FixturesController {
         };
       }
       const fixtures = message.fixtures;
-      //console.log('Processing fixtures:', fixtures);
 
       const savedFixtures = await this.fixtureService.createOrUpdateFixtures(fixtures);
-      //console.log('Saved fixtures:', savedFixtures);
 
       return {
         statusCode: HttpStatus.CREATED,
@@ -88,8 +88,8 @@ export class FixturesController {
   async processHistoryFixtures(@Body() requestBody: any): Promise<any> {
     try {
       const { message } = requestBody;
-      console.log('Enter patch for history');
-      console.log('Received message:', message);
+      // console.log('Enter patch for history');
+      // console.log('Received message:', message);
     
   
       // Usar la función de validación

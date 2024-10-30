@@ -1,42 +1,43 @@
 // src/requests/requests.controller.ts
 import { Body, Controller, Post, HttpStatus, HttpException, Get, Param } from '@nestjs/common';
 import { RequestsService } from './requests.service';
+import { OtherBetsService } from '../bets/other-bets/other-bets.service';
+
+import { AvailableBondsByFixtureService } from 'available-bonds/available-bonds-by-fixture.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('requests')
 
 @Controller('requests')
 export class RequestsController {
-  constructor(private readonly requestsService: RequestsService) {}
+  constructor(private readonly requestsService: RequestsService,
+              private readonly otherBetsService: OtherBetsService,
+              private readonly availableBondsByFixtureService: AvailableBondsByFixtureService
+  ) {}
 
-  @Post()
-  async processFixtures(@Body() requestBody: any): Promise<any> {
+  @Post('process')
+  async processRequest(@Body() requestBody: any): Promise<any> {
     try {
-      console.log('Received request body:', requestBody);
-  
-      // Ahora, requestBody es directamente el objeto que quieres procesar
-      // No necesitas extraerlo de una propiedad `message`
-      if (!requestBody || typeof requestBody !== 'object') {
-        console.log('Invalid data format:', requestBody);
-        return {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Invalid data format',
-        };
-      }
-  
-      const fixtures = requestBody; // requestBody ya es el objeto que quieres
-      console.log('Processing fixtures:', fixtures);
+      const request = requestBody.message;
 
-      const savedFixtures = await this.requestsService.createOrUpdateFixtures(fixtures);
-      console.log('GUARDADO REQUEST:', savedFixtures);
+      const { wallet, ...createOtherBet } = request;
+
+      // procesar si es nuestra apuesta o de otro grupo en request service llamando otherBetsService
+      if (request.group_id !== 23) {
+        // es otra apuesta
+        this.otherBetsService.createOtherBet(createOtherBet);
+      }
+
+      // luego disminuir los bonos disponibles en availableBondsByFixtureService
+      const fixtureId = request.fixture_id;
+      const quantity = Number(request.quantity);
+      
+      await this.availableBondsByFixtureService.decrementAvailableBonds(fixtureId, quantity);
+
     } catch (error) {
       console.error('Error REQUEST', error);
       throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  @Get('total-bonus-avaliable/:fixture_id')
-  async getTotalBonusAvaliable(@Param('fixture_id') fixture_id: number): Promise<number> {
-    const totalRequest = await this.requestsService.calculateTotalRequestsByFixtureId(fixture_id);
-    const totalBonusAvailable = 40 - totalRequest;
-    return totalBonusAvailable;
   }
 
   @Post('validation')

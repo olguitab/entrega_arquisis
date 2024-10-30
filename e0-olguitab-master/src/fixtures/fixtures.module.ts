@@ -10,6 +10,7 @@ import { BetModule } from 'bets/bets.module';
 import { AvailableBondsByFixtureSchema } from '../available-bonds/available-bonds-by-fixture.schema'; 
 import { AvailableBondsByFixtureModule } from '../available-bonds/available-bonds-by-fixture.module'; 
 import { WalletModule } from 'wallet/wallet.module';
+import { TransactionModule } from 'transactions/transactions.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WalletModule } from 'wallet/wallet.module';
     MqttModule,
     BetModule,
     WalletModule,
+    TransactionModule,
   ],
   providers: [FixtureService, BetService],
   controllers: [FixturesController],

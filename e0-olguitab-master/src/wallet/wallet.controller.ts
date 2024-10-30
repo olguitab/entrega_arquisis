@@ -1,6 +1,10 @@
-import { Controller, Post, Body, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Put, HttpStatus, Get, Param, Query, NotFoundException, BadRequestException } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { Types } from 'mongoose';
+
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('wallet')
 
 @Controller('wallet')
 export class WalletController {
@@ -19,12 +23,19 @@ export class WalletController {
 
   @Get('all')
   async getAll(): Promise<any> {
-    //console.log('entra al get all wallets');
     const wallets = await this.walletService.findAll();
     if (!wallets) {
       throw new Error('Wallets no encontradas');
     }
     return wallets;
+  }
+
+  @Put('update/:user_id')
+  async updateWalletBalance(
+    @Param('user_id') user_id: string,
+    @Body('amount') amount: number
+  ): Promise<void> {
+    await this.walletService.updateWalletBalance(user_id, amount);
   }
 
 }

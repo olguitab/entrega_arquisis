@@ -1,5 +1,8 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { AvailableBondsByFixtureService } from './available-bonds-by-fixture.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('available-bonds')
 
 @Controller('available-bonds')
 export class AvailableBondsByFixtureController {
@@ -25,7 +28,9 @@ export class AvailableBondsByFixtureController {
     async decrementAvailableBondsByFixture(
         @Param('fixtureId') fixtureId: number,
         @Param('quantity') quantity: number
-        ) {
+        ) 
+        {
+        console.log('Recibiendo request en available bonds de fixtureId:', fixtureId);
         try {
             const result = await this.availableBondsByFixtureService.decrementAvailableBonds(fixtureId, Number(quantity));
         if (!result) {
