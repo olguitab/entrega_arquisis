@@ -4,6 +4,9 @@ import { RequestsService } from './requests.service';
 import { OtherBetsService } from '../bets/other-bets/other-bets.service';
 
 import { AvailableBondsByFixtureService } from 'available-bonds/available-bonds-by-fixture.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('requests')
 
 @Controller('requests')
 export class RequestsController {

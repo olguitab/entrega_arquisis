@@ -1,5 +1,8 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { AvailableBondsByFixtureService } from './available-bonds-by-fixture.service';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('available-bonds')
 
 @Controller('available-bonds')
 export class AvailableBondsByFixtureController {
