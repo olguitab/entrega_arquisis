@@ -9,9 +9,6 @@ import { WalletService } from 'wallet/wallet.service';
 import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TransactionService } from 'transactions/transactions.service';  // Asegúrate de tener acceso al servicio de transacciones
 
-import { ApiTags } from '@nestjs/swagger';
-
-@ApiTags('bets')
 
 @Controller('api/bet')
 export class BetController {

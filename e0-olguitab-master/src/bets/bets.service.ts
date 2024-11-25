@@ -28,7 +28,7 @@ async getRecommendations(userId: string) {
     return response.data; // Maneja la respuesta según tu necesidad
   } catch (error) {
     console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera
+    throw error; // O maneja el error de otra manera.
   }
 }
   async getjob(obId: string) {

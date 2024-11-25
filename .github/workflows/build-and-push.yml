@@ -3,8 +3,8 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      - main
-      # - webpay-deploy
+      # - main
+      - workers-deploy-test
 
 permissions:
   id-token: write
