@@ -9,6 +9,8 @@ import { WalletModule } from 'wallet/wallet.module';
 import { TransactionModule } from 'transactions/transactions.module';
 import { UsersModule } from 'user/user.module';
 
+import { AuthModule } from 'auth/auth.module';
+
 
 
 @Module({
@@ -19,6 +21,7 @@ import { UsersModule } from 'user/user.module';
     WalletModule,
     TransactionModule,
     UsersModule,
+    AuthModule,
   ],
   providers: [BetService],
   controllers: [BetController],

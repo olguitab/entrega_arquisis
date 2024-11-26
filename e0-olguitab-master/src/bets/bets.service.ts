@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBetDto } from './create-bet.dto';
@@ -13,6 +13,7 @@ import { UsersService } from 'user/user.service';
 
 
 import { TransactionService } from 'transactions/transactions.service';
+
 
 
 @Injectable()
@@ -69,6 +70,32 @@ async getRecommendations(userId: string) {
       quantity: createdBet.quantity,
       wallet: createdBet.wallet,
       seller: 0,
+
+    };
+
+    await this.mqttService.publishToMqttRequests(JSON.stringify(message));
+    return createdBet.toObject();
+  }
+
+  async createAdminBet(createBetDto: CreateBetDto): Promise<Bet> {
+    const createdBet = new this.betModel(createBetDto);
+    await createdBet.save();
+
+    console.log("Creating an ADMIN bet triggered by front signal")
+
+    const message = {
+      request_id: createdBet.request_id,
+      group_id: createdBet.group_id,
+      fixture_id: createdBet.fixture_id,
+      league_name: createdBet.league_name,
+      round: createdBet.round,
+      date: createdBet.date,
+      result: createdBet.result,
+      deposit_token: createdBet.deposit_token,
+      datetime: new Date().toISOString(),
+      quantity: createdBet.quantity,
+      wallet: createdBet.wallet,
+      seller: 23,
 
     };
 

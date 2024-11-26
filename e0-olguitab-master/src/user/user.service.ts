@@ -64,6 +64,11 @@ export class UsersService {
     return admin.toObject();
   }
 
+  async deleteAdminBets(): Promise<any> {
+    const adminId = await this.getAdminId();
+    // función para borrar los admin bets que salieron con mal seller
+  }
+
   async getAdminId(): Promise<any> {
     const admin = await this.userModel.findOne({ role: UserRole.Admin });
     if (!admin) {
