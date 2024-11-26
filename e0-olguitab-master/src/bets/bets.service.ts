@@ -9,6 +9,8 @@ import { AvailableBondsByFixtureService } from '../available-bonds/available-bon
 import { WalletService } from '../wallet/wallet.service';
 import axios from 'axios'; // Importa Axios aquí
 
+import { UsersService } from 'user/user.service';
+
 
 import { TransactionService } from 'transactions/transactions.service';
 
@@ -19,7 +21,8 @@ export class BetService {
   private readonly mqttService: MqttService,
   private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
   private readonly walletService: WalletService,
-  private readonly transactionService: TransactionService
+  private readonly transactionService: TransactionService,
+  private readonly usersService: UsersService,
 
 ) {}
 async getRecommendations(userId: string) {
@@ -110,6 +113,11 @@ async getRecommendations(userId: string) {
 
     }
 
+  }
+
+  async getReservedBets() : Promise<Bet[]> {
+    const adminId = await this.usersService.getAdminId();
+    return this.findBetsByFixtureId(adminId);
   }
 
 

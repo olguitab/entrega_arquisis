@@ -84,4 +84,9 @@ export class BetController {
     // await this.transactionService.checkBetCreation(createdBet);
     return createdBet;
   }
+
+  @Get('reserved')
+  async getReservedBets() : Promise<Bet[]> {
+    return this.betService.getReservedBets();
+  }
 }

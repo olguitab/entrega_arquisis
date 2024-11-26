@@ -7,6 +7,7 @@ import { MqttModule } from '../mqtt/mqtt.module';
 import { AvailableBondsByFixtureModule } from '../available-bonds/available-bonds-by-fixture.module';
 import { WalletModule } from 'wallet/wallet.module';
 import { TransactionModule } from 'transactions/transactions.module';
+import { UsersModule } from 'user/user.module';
 
 
 
@@ -17,6 +18,7 @@ import { TransactionModule } from 'transactions/transactions.module';
     AvailableBondsByFixtureModule,
     WalletModule,
     TransactionModule,
+    UsersModule,
   ],
   providers: [BetService],
   controllers: [BetController],

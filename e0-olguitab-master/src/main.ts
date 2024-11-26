@@ -15,7 +15,11 @@ async function bootstrap() {
   });
   */
 
-  app.enableCors();
+  //app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:4000', // Especifica el origen permitido
+    credentials: true,               // Permite el uso de cookies o credenciales
+  });
 
   // Configuración de Swagger
   const config = new DocumentBuilder()

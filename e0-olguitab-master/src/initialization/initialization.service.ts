@@ -4,22 +4,29 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Fixture } from 'fixtures/fixtures.schema'; // Asegúrate de importar tu esquema de Fixture correctamente
 import { Bet } from 'bets/bet.schema';
-import { Transaction } from 'transactions/transactions.schema' 
+import { Transaction } from 'transactions/transactions.schema';
+import { User } from 'user/user.schema';
+import { UserRole } from 'user/user-role.enum';
+import { UsersService } from 'user/user.service';
 
 import { AvailableBondsByFixture } from 'available-bonds/available-bonds-by-fixture.schema';
 
 @Injectable()
 export class InitializationService implements OnModuleInit {
   constructor(
-    @InjectModel("Fixture") private fixtureModel: Model<Fixture>,
+    @InjectModel('Fixture') private fixtureModel: Model<Fixture>,
     @InjectModel('Bet') private betModel: Model<Bet>,
     @InjectModel('Transaction') private transactionModel: Model<Transaction>,
-    @InjectModel('AvailableBondsByFixture') private availableBondsByFixtureModel: Model<AvailableBondsByFixture>
+    @InjectModel('AvailableBondsByFixture') private availableBondsByFixtureModel: Model<AvailableBondsByFixture>,
+    @InjectModel('User') private userModel: Model<User>,
+    private userService: UsersService
   ) {}
 
   async onModuleInit() {
     //await this.cleanFixtures();
     //await this.addAvailableBondsToFixtures();
+    //await this.updateUserRoles();
+    //await this.userService.createAdmin();
   }
 
   async cleanFixtures() {
@@ -62,6 +69,13 @@ export class InitializationService implements OnModuleInit {
     } catch (error) {
       console.error("Error actualizando availableBonds en fixtures:", error);
     }
+  }
+
+  async updateUserRoles() {
+    await this.userModel.updateMany(
+      { role: { $exists: false } }, // Condición: si no tienen rol
+      { $set: { role: UserRole.Client } } // Asigna el rol `client`
+    );
   }
   
 }

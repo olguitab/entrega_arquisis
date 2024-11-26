@@ -20,7 +20,7 @@ import { WebpayModule } from 'webpay/webpay.module';
 import { TransactionModule } from 'transactions/transactions.module'
 import { TransactionSchema } from 'transactions/transactions.schema'
 
-
+import { UserSchema } from 'user/user.schema';
 
 
 @Module({
@@ -30,6 +30,7 @@ import { TransactionSchema } from 'transactions/transactions.schema'
     MongooseModule.forFeature([{ name: 'AvailableBondsByFixture', schema: AvailableBondsByFixtureSchema }]),
     MongooseModule.forFeature([{ name: 'Bet', schema: BetSchema }]),
     MongooseModule.forFeature([{ name: 'Transaction', schema: TransactionSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UsersModule,
     BetModule,
     FixturesModule,
