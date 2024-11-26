@@ -13,7 +13,7 @@ export class AuctionService {
   ) {}
 
   async offerToOtherGroups(body: any) {
-    // buscar los bonos de admin,
+    // buscar los bonos de admin a ofrecer (vienen en el body),
     // crear el auction type: offer
     // y ofertar la cantidad elegida a otros grupos en el broker
 

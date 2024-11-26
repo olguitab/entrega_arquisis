@@ -12,6 +12,8 @@ import { AvailableBondsByFixtureModule } from '../available-bonds/available-bond
 import { WalletModule } from 'wallet/wallet.module';
 import { TransactionModule } from 'transactions/transactions.module';
 
+import { UsersModule } from 'user/user.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Fixture', schema: FixtureSchema }]),
@@ -22,6 +24,7 @@ import { TransactionModule } from 'transactions/transactions.module';
     BetModule,
     WalletModule,
     TransactionModule,
+    UsersModule,
   ],
   providers: [FixtureService, BetService],
   controllers: [FixturesController],
