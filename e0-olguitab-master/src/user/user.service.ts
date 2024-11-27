@@ -74,6 +74,7 @@ export class UsersService {
     if (!admin) {
       throw new Error('Admin not found');
     }
+    console.log('Admin ID:', admin._id);
     return admin._id;
   }
   

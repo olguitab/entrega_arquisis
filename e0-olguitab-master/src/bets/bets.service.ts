@@ -26,27 +26,31 @@ export class BetService {
   private readonly usersService: UsersService,
 
 ) {}
-async getRecommendations(userId: string) {
-  try {
-    const response = await axios.post(`http://producer:8000/job`, { user_id: userId });
-    return response.data; // Maneja la respuesta según tu necesidad
-  } catch (error) {
-    console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera.
+
+  async getRecommendations(userId: string) {
+    try {
+      const response = await axios.post(`http://producer:8000/job`, { user_id: userId });
+      return response.data; // Maneja la respuesta según tu necesidad
+    } catch (error) {
+      console.error('Error al obtener recomendaciones:', error);
+      throw error; // O maneja el error de otra manera.
+    }
   }
-}
+  
   async getjob(obId: string) {
-  try {
-    const response = await axios.get(`http://producer:8000/job/${obId}`);
-    return response.data; // Maneja la respuesta según tu necesidad
-  } catch (error) {
-    console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera
+    try {
+      const response = await axios.get(`http://producer:8000/job/${obId}`);
+      return response.data; // Maneja la respuesta según tu necesidad
+    } catch (error) {
+      console.error('Error al obtener recomendaciones:', error);
+      throw error; // O maneja el error de otra manera
+    }
   }
-}
+
   async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ id_usuario: userId }).exec();
   }
+
   async findAll(): Promise<Bet[]> {
     return this.betModel.find().exec();
   }
@@ -144,7 +148,7 @@ async getRecommendations(userId: string) {
 
   async getReservedBets() : Promise<Bet[]> {
     const adminId = await this.usersService.getAdminId();
-    return this.findBetsByFixtureId(adminId);
+    return this.findBetsByUserId(adminId);
   }
 
 
