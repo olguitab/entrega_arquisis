@@ -5,30 +5,30 @@ import asyncio
 import redis
 import json
 
-
-# Conexión a Redis (suponiendo que Redis esté en ejecución en localhost:6379)
+# Conexión a Redis
 cache = redis.StrictRedis(host='redis-broker', port=6379, db=0, decode_responses=True)
 
 async def get_user_bets(user_id):
     async with httpx.AsyncClient() as client:
         try:
+            # Verificar si ya hay datos en caché
+            cached_bets = cache.get(f"user_bets_{user_id}")
+            if cached_bets:
+                return json.loads(cached_bets)
+
             # Obtener el historial de apuestas del usuario
             response = await client.get(f"https://olguitabarriga.me/api/bet/history/{user_id}")
             response.raise_for_status()
             user_bets = response.json()
-            print(f"User Bets Response: {user_bets}")
 
-            # Filtrar las apuestas con un "result" diferente a "---"
+            # Filtrar y procesar las apuestas
             valid_bets = [bet for bet in user_bets if bet["result"] != "---"]
-
-            # Extraer los nombres de los equipos apostados y contar las repeticiones
-            team_names = [bet["league_name"] for bet in valid_bets]  # Ajustar campo según el nombre del equipo
+            team_names = [bet["league_name"] for bet in valid_bets]
             team_counts = Counter(team_names)
-            
-            # Ordenar equipos por frecuencia
-            ordered_teams = [team for team, count in team_counts.most_common()]
-            print(f"Ordered Teams by Frequency: {ordered_teams}")
+            ordered_teams = [team for team, _ in team_counts.most_common()]
 
+            # Almacenar en caché por 6 horas
+            cache.setex(f"user_bets_{user_id}", 21600, json.dumps(ordered_teams))
             return ordered_teams
         except httpx.HTTPStatusError as e:
             print(f"Error al obtener apuestas del usuario: {e}")
@@ -38,79 +38,71 @@ async def get_user_bets(user_id):
             return []
 
 async def get_upcoming_matches():
-    async with httpx.AsyncClient() as client:
-        try:
-            # Obtener todos los próximos partidos
+    try:
+        # Verificar si los partidos ya están en caché
+        cached_matches = cache.get("upcoming_matches")
+        if cached_matches:
+            return json.loads(cached_matches)
+
+        async with httpx.AsyncClient() as client:
             response = await client.get("https://olguitabarriga.me/fixtures")
             response.raise_for_status()
             matches = response.json().get('data', [])
-            print(f"All Upcoming Matches: {matches}")
+
+            # Almacenar en caché por 1 hora
+            cache.setex("upcoming_matches", 3600, json.dumps(matches))
             return matches
-        except httpx.HTTPStatusError as e:
-            print(f"Error al obtener todos los próximos partidos: {e}")
-            return []
-        except Exception as e:
-            print(f"Error inesperado: {e}")
-            return []
+    except httpx.HTTPStatusError as e:
+        print(f"Error al obtener partidos: {e}")
+        return []
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return []
 
 async def find_top_recommended_matches(teams):
     all_matches = await get_upcoming_matches()
     recommended_matches = []
 
-    # Filtrar los partidos donde participan los equipos en `teams`
     for team in teams:
         for match in all_matches:
+            if len(recommended_matches) >= 3:  # Detener al alcanzar 3 recomendaciones
+                return recommended_matches
+
             home_team = match['teams']['home']['name']
             away_team = match['teams']['away']['name']
 
             if team in (home_team, away_team):
-                # Seleccionar el equipo como ganador según el equipo favorito del usuario
-                recommended_winner = team
-                match_info = {
+                recommended_matches.append({
                     "fixture_id": match["fixture"]["id"],
-                    "fixture_data": match,
-                    "recommended_winner": recommended_winner
-                }
-                recommended_matches.append(match_info)
-                print(f"Found Match for Team {team}: {match_info}")
+                    "recommended_winner": team
+                })
 
-            if len(recommended_matches) >= 3:
-                return recommended_matches
-
-    # Si no hay suficientes coincidencias, agregar los primeros partidos disponibles con equipo local como ganador
+    # Si no hay suficientes recomendaciones, agregar más partidos
     if len(recommended_matches) < 3:
-        additional_matches_needed = 3 - len(recommended_matches)
+        additional_matches = 3 - len(recommended_matches)
         for match in all_matches:
-            if match not in [rm["fixture_data"] for rm in recommended_matches]:
-                home_team = match['teams']['home']['name']
-                match_info = {
-                    "fixture_id": match["fixture"]["id"],
-                    "fixture_data": match,
-                    "recommended_winner": home_team
-                }
-                recommended_matches.append(match_info)
-                if len(recommended_matches) >= 3:
-                    break
+            if len(recommended_matches) >= 3:
+                break
+            home_team = match['teams']['home']['name']
+            recommended_matches.append({
+                "fixture_id": match["fixture"]["id"],
+                "recommended_winner": home_team
+            })
 
     return recommended_matches
 
 async def generate_recommendations(user_id):
-    # Primero, revisamos si ya hay recomendaciones guardadas en cache (Redis)
+    # Verificar caché para recomendaciones
     cached_recommendations = cache.get(f"user_recommendations_{user_id}")
     if cached_recommendations:
-        print(f"Using cached recommendations for user {user_id}")
         return json.loads(cached_recommendations)
 
-    # 1. Obtener y ordenar las apuestas históricas del usuario
+    # Obtener equipos favoritos del usuario
     teams = await get_user_bets(user_id)
 
-    # 2. Buscar los próximos partidos recomendados para estos equipos
+    # Buscar partidos recomendados
     recommendations = await find_top_recommended_matches(teams)
 
-    # Almacenar las recomendaciones en Redis (caché) por un tiempo determinado (ej. 24 horas)
-    cache.setex(f"user_recommendations_{user_id}", 86400, json.dumps(recommendations))
-
-    print(f"Recommendations: {recommendations}")
+    # Almacenar en caché por 6 horas
+    cache.setex(f"user_recommendations_{user_id}", 21600, json.dumps(recommendations))
     return recommendations
-
-
