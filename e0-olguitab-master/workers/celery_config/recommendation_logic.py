@@ -5,6 +5,7 @@ import asyncio
 import redis
 import json
 
+
 # Conexión a Redis (suponiendo que Redis esté en ejecución en localhost:6379)
 cache = redis.StrictRedis(host='redis-broker', port=6379, db=0, decode_responses=True)
 
