@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBetDto } from './create-bet.dto';
@@ -9,8 +9,11 @@ import { AvailableBondsByFixtureService } from '../available-bonds/available-bon
 import { WalletService } from '../wallet/wallet.service';
 import axios from 'axios'; // Importa Axios aquí
 
+import { UsersService } from 'user/user.service';
+
 
 import { TransactionService } from 'transactions/transactions.service';
+
 
 
 @Injectable()
@@ -19,30 +22,35 @@ export class BetService {
   private readonly mqttService: MqttService,
   private readonly availableBondsByFixtureService: AvailableBondsByFixtureService,
   private readonly walletService: WalletService,
-  private readonly transactionService: TransactionService
+  private readonly transactionService: TransactionService,
+  private readonly usersService: UsersService,
 
 ) {}
-async getRecommendations(userId: string) {
-  try {
-    const response = await axios.post(`http://producer:8000/job`, { user_id: userId });
-    return response.data; // Maneja la respuesta según tu necesidad
-  } catch (error) {
-    console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera.
+
+  async getRecommendations(userId: string) {
+    try {
+      const response = await axios.post(`http://producer:8000/job`, { user_id: userId });
+      return response.data; // Maneja la respuesta según tu necesidad
+    } catch (error) {
+      console.error('Error al obtener recomendaciones:', error);
+      throw error; // O maneja el error de otra manera.
+    }
   }
-}
+  
   async getjob(obId: string) {
-  try {
-    const response = await axios.get(`http://producer:8000/job/${obId}`);
-    return response.data; // Maneja la respuesta según tu necesidad
-  } catch (error) {
-    console.error('Error al obtener recomendaciones:', error);
-    throw error; // O maneja el error de otra manera
+    try {
+      const response = await axios.get(`http://producer:8000/job/${obId}`);
+      return response.data; // Maneja la respuesta según tu necesidad
+    } catch (error) {
+      console.error('Error al obtener recomendaciones:', error);
+      throw error; // O maneja el error de otra manera
+    }
   }
-}
+
   async findBetsByUserId(userId: string): Promise<Bet[]> {
     return this.betModel.find({ id_usuario: userId }).exec();
   }
+
   async findAll(): Promise<Bet[]> {
     return this.betModel.find().exec();
   }
@@ -66,6 +74,32 @@ async getRecommendations(userId: string) {
       quantity: createdBet.quantity,
       wallet: createdBet.wallet,
       seller: 0,
+
+    };
+
+    await this.mqttService.publishToMqttRequests(JSON.stringify(message));
+    return createdBet.toObject();
+  }
+
+  async createAdminBet(createBetDto: CreateBetDto): Promise<Bet> {
+    const createdBet = new this.betModel(createBetDto);
+    await createdBet.save();
+
+    console.log("Creating an ADMIN bet triggered by front signal")
+
+    const message = {
+      request_id: createdBet.request_id,
+      group_id: createdBet.group_id,
+      fixture_id: createdBet.fixture_id,
+      league_name: createdBet.league_name,
+      round: createdBet.round,
+      date: createdBet.date,
+      result: createdBet.result,
+      deposit_token: createdBet.deposit_token,
+      datetime: new Date().toISOString(),
+      quantity: createdBet.quantity,
+      wallet: createdBet.wallet,
+      seller: 23,
 
     };
 
@@ -110,6 +144,11 @@ async getRecommendations(userId: string) {
 
     }
 
+  }
+
+  async getReservedBets() : Promise<Bet[]> {
+    const adminId = await this.usersService.getAdminId();
+    return this.findBetsByUserId(adminId);
   }
 
 

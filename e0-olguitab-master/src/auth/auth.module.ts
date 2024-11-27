@@ -6,6 +6,9 @@ import { UsersModule } from 'user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 
+import { RolesGuard } from './guards/roles.guards';
+import { AuthGuard } from './guards/auth.guard';
+
 @Module({
     imports: [
         forwardRef(() => UsersModule),
@@ -15,7 +18,7 @@ import { AuthService } from './auth.service';
         signOptions: { expiresIn: '24h' }, 
       }),
     ],
-    providers: [AuthService, JwtStrategy],
-    exports: [AuthService],
+    providers: [AuthService, JwtStrategy, RolesGuard, AuthGuard],
+    exports: [AuthService, RolesGuard, AuthGuard],
   })
   export class AuthModule {}

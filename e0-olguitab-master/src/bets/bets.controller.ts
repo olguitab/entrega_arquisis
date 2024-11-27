@@ -1,5 +1,5 @@
 // src/bet/bet.controller.ts
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards, } from '@nestjs/common';
 import { Request } from 'express';
 import { BetService } from './bets.service';
 import { CreateBetDto } from './create-bet.dto';
@@ -9,6 +9,9 @@ import { WalletService } from 'wallet/wallet.service';
 import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TransactionService } from 'transactions/transactions.service';  // Asegúrate de tener acceso al servicio de transacciones
 
+import { AuthGuard } from '@nestjs/passport';
+
+import * as jwt from 'jsonwebtoken';
 
 @Controller('api/bet')
 export class BetController {
@@ -16,7 +19,7 @@ export class BetController {
               private readonly walletService: WalletService,
               private readonly transactionService: TransactionService) {}
 
-  @Get(':userId')
+  @Get('recommendations/:userId')
   async getRecommendations(@Param('userId') userId: string) {
     if (!userId) {
       throw new NotFoundException('User ID is required');
@@ -49,7 +52,7 @@ export class BetController {
     return this.betService.findAll(); 
   }
 
-
+  //@UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() createBetDto: CreateBetDto, @Req() request: Request): Promise<Bet> {
     // Intenta obtener la dirección IP del cliente de varias maneras, priorizando 'x-forwarded-for'
@@ -74,14 +77,43 @@ export class BetController {
       console.error('Error al obtener la ubicación:', error);
       // Maneja el error según sea necesario
     }
-    
-    const createdBet = await this.betService.createbet(createBetDto);
 
-    /* Esto debe estar directamente en wallet
-    const moneySpent = createdBet.quantity * 1000;
-    this.walletService.updateWalletBalance(createdBet.id_usuario, -moneySpent); 
-    */
-    // await this.transactionService.checkBetCreation(createdBet);
-    return createdBet;
+    // console.log('Request headers:')
+    // console.log(request.headers);
+
+    const authorizationHeader = request.headers.authorization;
+
+    //console.log('Authorization header:', authorizationHeader);
+    let token;
+
+    if (authorizationHeader && authorizationHeader.startsWith('Bearer ')) {
+      token = authorizationHeader.slice(7); // Elimina "Bearer " (7 caracteres)
+      //console.log('Token:', token); 
+    } else {
+      console.log('No token found');
+    }
+
+    if (token !== undefined && token !== null) {
+      console.log('Accede al token:', token);
+      const decoded = jwt.verify(token, 'secretKey') as jwt.JwtPayload;
+      //console.log('Decoded token:', decoded);
+      const userRole = decoded.role;
+      console.log('User role:', userRole);
+      if (userRole === 'admin') {
+        return await this.betService.createAdminBet(createBetDto);
+      }
+      else {
+        console.log('Accede al token pero no es admin');
+        return await this.betService.createbet(createBetDto);
+      }      
+    }
+
+    return await this.betService.createbet(createBetDto);
+
+  }
+
+  @Get('reserved')
+  async getReservedBets() : Promise<Bet[]> {
+    return this.betService.getReservedBets();
   }
 }

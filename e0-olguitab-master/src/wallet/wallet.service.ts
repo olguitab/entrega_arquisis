@@ -74,18 +74,16 @@ export class WalletService {
     return wallet.save(); // Guarda el wallet actualizado en la base de datos
   }
   async getWalletBalance(user_id: string): Promise<number> {
-    console.log('entra a get wallet balance id:', user_id);
+    //console.log('entra a get wallet balance id:', user_id);
     
     // Convertir user_id a ObjectId
     const objectId = new Types.ObjectId(user_id);
-    
     const wallet = await this.walletModel.findOne({ user_id: objectId });
-    console.log('Wallet found:', wallet);
+    //console.log('Wallet found:', wallet);
     
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
     }
-    
     return wallet.money;
   }
 

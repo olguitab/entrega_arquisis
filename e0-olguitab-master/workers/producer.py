@@ -8,6 +8,7 @@ app = FastAPI()
 class JobRequest(BaseModel):
     user_id: str
 
+
 @app.post("/job")
 async def create_job(request: JobRequest):
     task = generate_recommendations_task.delay(request.user_id)  # Asegúrate de que este método está definido en tasks.py
