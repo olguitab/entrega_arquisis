@@ -2,6 +2,12 @@ import httpx
 from collections import Counter
 from celery import shared_task
 import asyncio
+import redis
+import json
+
+
+# Conexión a Redis (suponiendo que Redis esté en ejecución en localhost:6379)
+cache = redis.StrictRedis(host='redis-broker', port=6379, db=0, decode_responses=True)
 
 async def get_user_bets(user_id):
     async with httpx.AsyncClient() as client:
@@ -89,14 +95,22 @@ async def find_top_recommended_matches(teams):
     return recommended_matches
 
 async def generate_recommendations(user_id):
+    # Primero, revisamos si ya hay recomendaciones guardadas en cache (Redis)
+    cached_recommendations = cache.get(f"user_recommendations_{user_id}")
+    if cached_recommendations:
+        print(f"Using cached recommendations for user {user_id}")
+        return json.loads(cached_recommendations)
+
     # 1. Obtener y ordenar las apuestas históricas del usuario
     teams = await get_user_bets(user_id)
 
     # 2. Buscar los próximos partidos recomendados para estos equipos
     recommendations = await find_top_recommended_matches(teams)
 
+    # Almacenar las recomendaciones en Redis (caché) por un tiempo determinado (ej. 24 horas)
+    cache.setex(f"user_recommendations_{user_id}", 86400, json.dumps(recommendations))
+
     print(f"Recommendations: {recommendations}")
     return recommendations
-
 
 
