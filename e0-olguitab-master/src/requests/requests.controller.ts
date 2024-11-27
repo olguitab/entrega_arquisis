@@ -21,6 +21,7 @@ export class RequestsController {
       const request = requestBody.message;
 
       const { wallet, ...createOtherBet } = request;
+      request.group_id = Number(request.group_id);
 
       // procesar si es nuestra apuesta o de otro grupo en request service llamando otherBetsService
       if (request.group_id !== 23) {

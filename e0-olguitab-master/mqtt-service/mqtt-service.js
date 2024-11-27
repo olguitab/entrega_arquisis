@@ -47,6 +47,15 @@ client.on('connect', () => {
       console.log('Subscribed to topic: fixtures/requests');
     }
   });
+
+  // -- fixtures/auctions --
+  client.subscribe('fixtures/auctions', (err) => {
+    if (err) {
+      console.error('Subscription error (fixtures/auctions):', err);
+    } else {
+      console.log('Subscribed to topic: fixtures/auctions');
+    }
+  });
 });
 
 
@@ -110,6 +119,23 @@ client.on('message', async (topic, message) => {
       console.error('Error processing MQTT message HISTORY:', error);
     }
   }
+
+  // -- fixtures/auctions --
+  else if (topic === 'fixtures/auctions') {
+    try {
+      const parsedMessage = JSON.parse(message.toString());
+      console.log('Received message on fixtures/auctions, sending to app...');
+      // console.log('Auctions message:\n', message.toString());
+
+      // verificar/cambiar endpoint
+      await axios.post(`${process.env.APP_URL}/auctions/manage-message`, {
+        topic,
+        message: parsedMessage,
+      });
+    } catch (error) {
+      console.error('Error processing MQTT message AUCTIONS:', error);
+    }
+  }
 });
 
 
@@ -137,6 +163,20 @@ app.post('/publish/validation', (req, res) => {
       return res.status(500).json({ message: 'Error publishing on MQTT' });
     }
     console.log(`Message published on validation:': ${message}`);
+    return res.status(200).json({ message: 'Published successfully on MQTT' });
+  });
+});
+
+// ----- PUBLISHING: POSTING ON AUCTIONS -----
+app.post('/publish/auctions', (req, res) => {
+  const { message } = req.body;
+  console.log("Publishing on auctions channel, triggered by a new auction ")
+  client.publish('fixtures/auctions', message, (err) => {
+    if (err) {
+      console.error('Error publishing on MQTT', err);
+      return res.status(500).json({ message: 'Error publishing on MQTT' });
+    }
+    console.log(`Message published on auctions:': ${message}`);
     return res.status(200).json({ message: 'Published successfully on MQTT' });
   });
 });

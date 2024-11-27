@@ -44,58 +44,58 @@ services:
     networks:
       - app-network
 
-  redis-broker:
-    image: redis:7
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-    networks:
-      - app-network
+  # redis-broker:
+  #   image: redis:7
+  #   volumes:
+  #     - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+  #   networks:
+  #     - app-network
 
-  # JobMaster (FastAPI)
-  producer:
-    build: 
-      context: ./workers
-      # dockerfile: Dockerfile
-    command: uvicorn producer:app --reload --host 0.0.0.0 --port 8000
-    expose:
-      - 8000
-    ports:
-      - "8000:8000"
-    networks:
-      - app-network
-    env_file:
-      - .env
-    environment:
-      # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
-      - CELERY_BROKER_URL=redis://redis-broker:6379/0  
-      - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
-      # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
-      # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+  # # JobMaster (FastAPI)
+  # producer:
+  #   build: 
+  #     context: ./workers
+  #     # dockerfile: Dockerfile
+  #   command: uvicorn producer:app --reload --host 0.0.0.0 --port 8000
+  #   expose:
+  #     - 8000
+  #   ports:
+  #     - "8000:8000"
+  #   networks:
+  #     - app-network
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
+  #     - CELERY_BROKER_URL=redis://redis-broker:6379/0  
+  #     - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
+  #     # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  #     # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
 
-  # Workers (Celery)
-  consumer:
-    build:
-      context: ./workers
-      # dockerfile: Dockerfile
+  # # Workers (Celery)
+  # consumer:
+  #   build:
+  #     context: ./workers
+  #     # dockerfile: Dockerfile
 
-    # el comentado es la ayudantía pero se caían los contenedores
-    command: celery -A consumer.celery_app worker --loglevel=INFO --purge --concurrency=1
-    #command: celery -A consumer worker --loglevel=INFO --purge --concurrency=1
+  #   # el comentado es la ayudantía pero se caían los contenedores
+  #   command: celery -A consumer.celery_app worker --loglevel=INFO --purge --concurrency=1
+  #   #command: celery -A consumer worker --loglevel=INFO --purge --concurrency=1
 
-    deploy:
-      replicas: 2 
-    volumes:
-      - ./workers:/opt/
-    networks:
-      - app-network
-    depends_on:
-      - redis-broker
-    environment:
-      # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
-      - CELERY_BROKER_URL=redis://redis-broker:6379/0  
-      - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
-      # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
-      # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+  #   deploy:
+  #     replicas: 2 
+  #   volumes:
+  #     - ./workers:/opt/
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - redis-broker
+  #   environment:
+  #     # TO DO: importar las variables de entorno de .env (ver repo ayudantía)
+  #     - CELERY_BROKER_URL=redis://redis-broker:6379/0  
+  #     - CELERY_RESULT_BACKEND=redis://redis-broker:6379/0
+  #     # CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  #     # CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
 
   # Dashboard de Celery (Flower)
   # dashboard:
