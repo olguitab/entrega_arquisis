@@ -3,7 +3,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Auction } from "./auction.schema";
 
-import { BetService } from "../bets/bets.service";
 import { MqttService } from "mqtt/mqtt.service";
 
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +11,6 @@ import { v4 as uuidv4 } from 'uuid';
 export class AuctionService {
   constructor(
     @InjectModel('Auction') private auctionModel: Model<Auction>,
-    private readonly betService: BetService,
     private readonly mqttService: MqttService
   ) {}
 
@@ -54,11 +52,13 @@ export class AuctionService {
     return await this.auctionModel.find({ group_id: 23, type: 'offer' });
   }
 
-  async answerProporsal(body: any) : Promise<Auction> {
+  async answerProporsal(body: any) : Promise<any> {
     // buscar el auction type: proposal con el id enviado y cambiar su estado a aceptado o rechazado (también en la data)
 
     // body.proposal_id es el uuid de proposal del auction type: proposal, y body.answer es "acceptance" o "rejection"
     let auction = this.auctionModel.updateOne({ auction_id: body.proposal_id }, { type: body.answer });
+    //auction = await this.auctionModel.findOne({ auction_id: body.proposal_id });
+
 
     // publicar respuesta al broker
     await this.mqttService.publishToMqttAuctions(JSON.stringify(auction));
