@@ -133,17 +133,30 @@ export class AuctionService {
     // si es type: offer, guardar en la base de datos para revisar las ofertas de otros grupos (si group_id !== 23)
 
 
-    // si es type: proposal, guardar en la base de datos y publicar en mqtt para que el broker lo envíe a los grupos correspondientes
-    // si es type: acceptance o rejection, guardar en la base de datos y publicar en mqtt para que el broker lo envíe a los grupos correspondientes
+    // si es type: proposal, guardar en la base de datos cuando el auction_id se encuentra en las auctions en nuestra bdd. 
+    // esto significa que el auction que recibe la proposal fue creado por nosotros
 
-    if (body.type === 'offer') {
+
+    // si es type: acceptance o rejection, guardar en la base de datos solo cuando se cumpla la misma condición previa
+
+    if (body.type === 'offer' && body.group_id !== 23) {
+      // que se cree y se guarde en la bdd
       await this.auctionModel.create(body);
-    } else if (body.type === 'proposal') {
-      await this.auctionModel.create(body);
-      await this.mqttService.publishToMqttAuctions(JSON.stringify(body));
-    } else if (body.type === 'acceptance' || body.type === 'rejection') {
-      await this.auctionModel.updateOne({ auction_id: body.auction_id }, { type: body.type });
-      await this.mqttService.publishToMqttAuctions(JSON.stringify(body));
+    }
+    else {
+      const auction = await this.auctionModel.findOne({ auction_id: body.auction_id });
+      if (auction) {
+        if (body.type === 'proposal') {
+          await this.auctionModel.create(body);
+          await this.mqttService.publishToMqttAuctions(JSON.stringify(body));
+        } else if (body.type === 'acceptance' || body.type === 'rejection') {
+          await this.auctionModel.updateOne({ auction_id: body.auction_id }, { type: body.type });
+          
+        }
+      }
+      else{
+        // no procesar, no es para nosotros
+      }
     }
   }
 }
