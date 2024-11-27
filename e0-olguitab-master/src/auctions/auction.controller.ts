@@ -16,9 +16,11 @@ export class AuctionController {
 
     // que venga en la data qué bet se debe ofertar y cuantos
 
-    if (!body.auctionId || !body.quantity) {
+    if (!body.fixture_id || !body.quantity) {
       throw new BadRequestException('Missing required fields');
     }
+
+    
 
     return this.auctionService.offerToOtherGroups(body);
   }
@@ -29,8 +31,8 @@ export class AuctionController {
   }
 
   @Post('answer-proporsal')
-  async answerProporsal(@Body() body: any) {
-    if (!body.proporsalId || !body.answer) {
+  async answerProporsal(@Body() body: any) { // answer = "acceptance" o "rejection"
+    if (!body.proposal_id || !body.answer) {
       throw new BadRequestException('Missing required fields');
     }
 
@@ -62,5 +64,12 @@ export class AuctionController {
     return this.auctionService.sendProposal(body);
   }
   
+  @Post('manage-message')
+  async manageBrokerMessage(@Body() body: any) {
+
+    body = JSON.parse(body);
+
+    return this.auctionService.manageBrokerMessage(body);
+  }
   
 }

@@ -5,6 +5,7 @@ import { AuctionController } from './auction.controller';
 import { Auction, AuctionSchema } from './auction.schema';
 import { User, UserSchema } from 'user/user.schema';
 import { BetModule } from 'bets/bets.module';
+import { MqttService } from 'mqtt/mqtt.service';
 
 @Module({
   imports:[
@@ -14,6 +15,7 @@ import { BetModule } from 'bets/bets.module';
 
     ]),
     BetModule,
+    MqttService
   ],
   controllers: [AuctionController],
   providers: [AuctionService],

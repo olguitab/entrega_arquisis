@@ -19,7 +19,7 @@ export class BetController {
               private readonly walletService: WalletService,
               private readonly transactionService: TransactionService) {}
 
-  @Get(':userId')
+  @Get('recommendations/:userId')
   async getRecommendations(@Param('userId') userId: string) {
     if (!userId) {
       throw new NotFoundException('User ID is required');

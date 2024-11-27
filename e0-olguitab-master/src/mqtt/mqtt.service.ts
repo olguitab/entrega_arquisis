@@ -23,4 +23,14 @@ export class MqttService {
             console.error('Error triggering mqtt-service:', error.message);
         }
     }
+
+    async publishToMqttAuctions(message: string): Promise<void> {
+        try {
+            const response = await axios.post(`${this.mqttServiceUrl}/publish/auctions`, { message });
+            console.log("Publish message on mqtt-service/auctions triggered successfully")
+        } catch (error) {
+            console.error('Error triggering mqtt-service:', error.message);
+        }
+    }
+
 }
